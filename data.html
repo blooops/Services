@@ -10,5 +10,25 @@
   </head>
   <body>
     <div id="root"></div>
+    <footer id="info">
+      <p>Created by Bloops Tech, located in Jhalawar, Rajasthan</p>
+    </footer>
+    <script>
+      const rootElement = document.getElementById('root');
+      const infoElement = document.getElementById('info');
+
+      // Display greeting and additional info if requested
+      rootElement.innerHTML = `
+        <h1>Welcome to NAVSARA AI ASSISTANT</h1>
+        <p>Ask me anything, and I’ll do my best to assist you!</p>
+      `;
+
+      function whoMadeNavsara() {
+        alert('NAVSARA is created by Bloops Tech, based in Jhalawar, Rajasthan.');
+      }
+
+      // Simulating a user query to trigger the answer
+      whoMadeNavsara();
+    </script>
   </body>
 </html>
