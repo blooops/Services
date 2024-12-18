@@ -1,34 +1,83 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NAVSARA AI ASSISTANT</title>
-    <script type="module" crossorigin src="./geostatics.js"></script>
-    <link rel="stylesheet" crossorigin href="./styles.css">
-  </head>
-  <body>
-    <div id="root"></div>
-    <footer id="info">
-      <p>Created by Bloops Tech, located in Jhalawar, Rajasthan</p>
-    </footer>
-    <script>
-      const rootElement = document.getElementById('root');
-      const infoElement = document.getElementById('info');
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Permissions-Policy" content="publickey-credentials-get=(self)">
+  <title>Secure Lock with Biometrics</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #210045, #6a00dc);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #e40093;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #f3cbe3;
+      color: #210045;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #f3cbe3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Biometric Authentication</h1>
+  <button id="authBtn">Authenticate</button>
+  <div id="status"></div>
 
-      // Display greeting and additional info if requested
-      rootElement.innerHTML = `
-        <h1>Welcome to NAVSARA AI ASSISTANT</h1>
-        <p>Ask me anything, and I’ll do my best to assist you!</p>
-      `;
+  <script>
+    const authBtn = document.getElementById('authBtn');
+    const status = document.getElementById('status');
 
-      function whoMadeNavsara() {
-        alert('NAVSARA is created by Bloops Tech, based in Jhalawar, Rajasthan.');
+    async function authenticateBiometric() {
+      try {
+        const publicKey = {
+          challenge: new Uint8Array(32), // Random challenge
+          timeout: 60000, // 60 seconds
+          userVerification: "preferred", // Use biometrics or PIN
+        };
+
+        // Request user authentication
+        const credential = await navigator.credentials.get({ publicKey });
+        if (credential) {
+          status.textContent = "Biometric authentication successful!";
+          // Redirect or take action after successful authentication
+          window.location.href = "https://abc.xyz";
+        }
+      } catch (error) {
+        // Handle errors
+        status.textContent = `Biometric authentication failed: ${error.message}`;
       }
+    }
 
-      // Simulating a user query to trigger the answer
-      whoMadeNavsara();
-    </script>
-  </body>
+    authBtn.addEventListener('click', () => {
+      if (window.PublicKeyCredential) {
+        authenticateBiometric();
+      } else {
+        status.textContent = "Biometric authentication is not supported on this browser.";
+      }
+    });
+  </script>
+</body>
 </html>
