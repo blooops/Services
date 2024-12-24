@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 370px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      border-bottom: 1px solid #333;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .form-container {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .form-container input, textarea {
+      background: #1a1a1a;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+
+    button {
+      background: #3897f0;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #1877f2;
+    }
+
+    .gallery, .upload-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      padding: 10px;
+    }
+
+    .card img, .card video {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      margin-top: 5px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 5px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 4px;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    .delete-btn:hover {
+      background: #c0392b;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-content {
+      position: relative;
+      max-width: 370px;
+      width: 90%;
+    }
+
+    .popup-content img, .popup-content video {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .popup-content h3 {
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <span class="header-title">Gallery</span>
+      <button class="toggle-btn" id="toggleView">+</button>
+    </header>
+
+    <div class="gallery" id="gallery">
+      <!-- Media will be loaded here -->
+    </div>
+
+    <div class="form-container" id="formContainer">
+      <input type="text" id="title" placeholder="Enter title" />
+      <input type="file" id="media" accept="image/*, video/*" multiple />
+      <button id="addMediaBtn">Add Media</button>
+      <div class="upload-list" id="uploadedMedia">
+        <!-- Uploaded media will be displayed here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <div id="popup-media"></div>
+      <h3 id="popup-title"></h3>
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById("toggleView");
+    const galleryContainer = document.getElementById("gallery");
+    const formContainer = document.getElementById("formContainer");
+    const addMediaBtn = document.getElementById("addMediaBtn");
+    const mediaInput = document.getElementById("media");
+    const titleInput = document.getElementById("title");
+    const uploadedMediaContainer = document.getElementById("uploadedMedia");
+    const popup = document.getElementById("popup");
+    const popupMedia = document.getElementById("popup-media");
+    const popupTitle = document.getElementById("popup-title");
+
+    let isGalleryVisible = true;
+
+    const mediaList = JSON.parse(localStorage.getItem("mediaList")) || [];
+
+    const renderGallery = () => {
+      galleryContainer.innerHTML = "";
+      uploadedMediaContainer.innerHTML = "";
+
+      mediaList.slice().reverse().forEach((item, reverseIndex) => {
+        const index = mediaList.length - 1 - reverseIndex;
+
+        // Display in gallery
+        const galleryCard = document.createElement("div");
+        galleryCard.className = "card";
+        galleryCard.innerHTML = item.type.startsWith("image")
+          ? `<img src="${item.src}" alt="${item.title}" data-index="${reverseIndex}">`
+          : `<video src="${item.src}" muted autoplay loop data-index="${reverseIndex}"></video>`;
+        galleryContainer.appendChild(galleryCard);
+
+        // Display in uploaded media section with delete button
+        const uploadCard = document.createElement("div");
+        uploadCard.className = "card";
+        uploadCard.innerHTML = `
+          ${item.type.startsWith("image")
+            ? `<img src="${item.src}" alt="${item.title}">`
+            : `<video src="${item.src}" muted autoplay loop></video>`}
+          <button class="delete-btn" data-index="${reverseIndex}">Delete</button>`;
+        uploadedMediaContainer.appendChild(uploadCard);
+      });
+    };
+
+    const saveMedia = () => {
+      localStorage.setItem("mediaList", JSON.stringify(mediaList));
+    };
+
+    const handleAddMedia = () => {
+      const files = mediaInput.files;
+      const title = titleInput.value.trim();
+
+      if (!files.length || !title) {
+        alert("Please provide a title and select at least one file.");
+        return;
+      }
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          mediaList.push({ src: reader.result, title, type: file.type });
+          saveMedia();
+          renderGallery();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      titleInput.value = "";
+      mediaInput.value = "";
+    };
+
+    const handleDeleteMedia = (reverseIndex) => {
+      const index = mediaList.length - 1 - reverseIndex;
+      mediaList.splice(index, 1);
+      saveMedia();
+      renderGallery();
+    };
+
+    uploadedMediaContainer.addEventListener("click", (e) => {
+      if (e.target.classList.contains("delete-btn")) {
+        const reverseIndex = e.target.dataset.index;
+        handleDeleteMedia(reverseIndex);
+      }
+    });
+
+    toggleBtn.addEventListener("click", () => {
+      isGalleryVisible = !isGalleryVisible;
+      galleryContainer.style.display = isGalleryVisible ? "grid" : "none";
+      formContainer.style.display = isGalleryVisible ? "none" : "flex";
+      toggleBtn.textContent = isGalleryVisible ? "+" : "🖼️";
+    });
+
+    galleryContainer.addEventListener("click", (e) => {
+      if (e.target.tagName === "IMG" || e.target.tagName === "VIDEO") {
+        const reverseIndex = e.target.dataset.index;
+        const index = mediaList.length - 1 - reverseIndex;
+        const item = mediaList[index];
+        popupMedia.innerHTML = item.type.startsWith("image")
+          ? `<img src="${item.src}" alt="${item.title}">`
+          : `<video src="${item.src}" controls autoplay></video>`;
+        popupTitle.textContent = item.title;
+        popup.style.display = "flex";
+      }
+    });
+
+    popup.addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+
+    addMediaBtn.addEventListener("click", handleAddMedia);
+
+    renderGallery();
+  </script>
+</body>
+</html>
