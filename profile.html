@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            width: 350px;
+        }
+        img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 10px 0;
+        }
+        button {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Your Profile</h2>
+        <img id="profilePic" alt="Profile Picture">
+        <p id="fullName"></p>
+        <p id="dob"></p>
+        <p id="mobile"></p>
+        <p id="email"></p>
+        <button onclick="editProfile()">Edit Profile</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) {
+            alert("No user is logged in. Redirecting to login.");
+            window.location.href = "index.html";
+        } else {
+            document.getElementById('profilePic').src = currentUser.profilePic || 'default-avatar.png';
+            document.getElementById('fullName').textContent = "Name: " + currentUser.fullName;
+            document.getElementById('dob').textContent = "DOB: " + currentUser.dob;
+            document.getElementById('mobile').textContent = "Mobile: " + currentUser.mobile;
+            document.getElementById('email').textContent = "Email: " + currentUser.email;
+        }
+
+        function editProfile() {
+            window.location.href = "edit.html";
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            alert("You have been logged out.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
