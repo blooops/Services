@@ -50,7 +50,6 @@
 <body>
     <div class="container">
         <h2>Signup</h2>
-        <p>Create an account to continue.</p>
         <input type="file" id="profilePic" accept="image/*">
         <input type="text" id="fullName" placeholder="Full Name">
         <input type="date" id="dob">
@@ -68,37 +67,32 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            if (!profilePic || !fullName || !dob || !mobile || !email || !password) {
-                alert("Please fill in all fields!");
+            if (!fullName || !dob || !mobile || !email || !password) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+
+            if (users[email] || Object.values(users).some(user => user.mobile === mobile)) {
+                alert("Email or Mobile already registered.");
                 return;
             }
 
             const reader = new FileReader();
             reader.onload = function () {
-                const profilePicURL = reader.result;
-
-                const users = JSON.parse(localStorage.getItem('users')) || {};
-                if (users[email] || Object.values(users).some(user => user.mobile === mobile)) {
-                    alert("User already exists with this email or mobile!");
-                    return;
-                }
-
-                const newUser = {
-                    profilePic: profilePicURL,
-                    fullName,
-                    dob,
-                    mobile,
-                    email,
-                    password,
-                };
-
-                users[email] = newUser;
+                const profilePicURL = profilePic ? reader.result : null;
+                users[email] = { profilePic: profilePicURL, fullName, dob, mobile, email, password };
                 localStorage.setItem('users', JSON.stringify(users));
-                alert("Signup successful!");
+                alert("Signup successful! Redirecting to login...");
                 window.location.href = "index.html";
             };
 
-            reader.readAsDataURL(profilePic);
+            if (profilePic) {
+                reader.readAsDataURL(profilePic);
+            } else {
+                reader.onload();
+            }
         }
     </script>
 </body>
