@@ -68,19 +68,18 @@
             const password = document.getElementById('password').value;
 
             if (!fullName || !dob || !mobile || !email || !password) {
-                alert("Please fill all fields.");
+                alert("Please fill all the fields!");
                 return;
             }
 
             const users = JSON.parse(localStorage.getItem('users')) || {};
-
-            if (users[email] || Object.values(users).some(user => user.mobile === mobile)) {
-                alert("Email or Mobile already registered.");
+            if (users[email] || users[mobile]) {
+                alert("User already exists!");
                 return;
             }
 
             const reader = new FileReader();
-            reader.onload = function () {
+            reader.onload = () => {
                 const profilePicURL = profilePic ? reader.result : null;
                 users[email] = { profilePic: profilePicURL, fullName, dob, mobile, email, password };
                 localStorage.setItem('users', JSON.stringify(users));
