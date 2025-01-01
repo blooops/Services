@@ -54,11 +54,9 @@
         <button onclick="login()">Next</button>
     </div>
     <script>
-        // Check if user is already logged in
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (currentUser) {
-            // Redirect to password.html if previously logged in
-            window.location.href = "password.html";
+            window.location.href = "password.html"; // Redirect to password.html
         }
 
         function login() {
