@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            width: 350px;
+        }
+        input, button {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            font-size: 16px;
+        }
+        input {
+            background: #2a2a2a;
+            color: #fff;
+        }
+        button {
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Profile</h2>
+        <input type="file" id="profilePic" accept="image/*">
+        <input type="text" id="fullName" placeholder="Full Name">
+        <input type="date" id="dob">
+        <input type="text" id="mobile" placeholder="Mobile Number">
+        <button onclick="saveProfile()">Save</button>
+    </div>
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+        document.getElementById('fullName').value = currentUser.fullName;
+        document.getElementById('dob').value = currentUser.dob;
+        document.getElementById('mobile').value = currentUser.mobile;
+
+        function saveProfile() {
+            const profilePic = document.getElementById('profilePic').files[0];
+            const fullName = document.getElementById('fullName').value;
+            const dob = document.getElementById('dob').value;
+            const mobile = document.getElementById('mobile').value;
+
+            if (!fullName || !dob || !mobile) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function () {
+                const profilePicURL = profilePic ? reader.result : currentUser.profilePic;
+
+                const users = JSON.parse(localStorage.getItem('users'));
+                const updatedUser = { ...currentUser, profilePic: profilePicURL, fullName, dob, mobile };
+
+                users[currentUser.email] = updatedUser;
+                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                alert("Profile updated successfully!");
+                window.location.href = "profile.html";
+            };
+
+            if (profilePic) {
+                reader.readAsDataURL(profilePic);
+            } else {
+                reader.onload();
+            }
+        }
+    </script>
+</body>
+</html>
