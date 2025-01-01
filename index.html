@@ -54,11 +54,23 @@
         <button onclick="login()">Next</button>
     </div>
     <script>
-        // Check if a user is already logged in by checking localStorage
+        // Check if a user is already logged in by checking the session timestamp
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser) {
-            // If a user is already logged in, redirect to password page
-            window.location.href = "password.html";
+        const lastLogin = localStorage.getItem('lastLogin');
+
+        if (currentUser && lastLogin) {
+            const currentTime = new Date().getTime();
+            const timeDifference = currentTime - lastLogin;
+
+            // Check if the session is less than 30 days old (30 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+            if (timeDifference < 30 * 24 * 60 * 60 * 1000) {
+                // Session is still valid, redirect to password page
+                window.location.href = "password.html";
+            } else {
+                // Session expired, prompt user to log in again
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('lastLogin');
+            }
         }
 
         function login() {
