@@ -1,21 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication System</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="login-box">
-            <h1>Login</h1>
-            <form id="loginForm">
-                <input type="text" id="identifier" placeholder="Email or Mobile No" required>
-                <button type="submit">Next</button>
-            </form>
-        </div>
+  <div id="app">
+    <!-- Login Section -->
+    <div id="loginSection" class="container">
+      <h1>Login</h1>
+      <form id="loginForm">
+        <input type="text" id="loginIdentifier" placeholder="Email or Mobile Number" required>
+        <button type="submit">Next</button>
+      </form>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Password Section -->
+    <div id="passwordSection" class="container hidden">
+      <div id="passwordProfile">
+        <div id="passwordDp" class="profile-dp"></div>
+        <h2 id="passwordName"></h2>
+      </div>
+      <form id="passwordForm">
+        <input type="password" id="loginPassword" placeholder="Enter Password" required>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+
+    <!-- Signup Section -->
+    <div id="signupSection" class="container hidden">
+      <h1>Signup</h1>
+      <form id="signupForm">
+        <input type="file" id="signupProfilePic" accept="image/*">
+        <input type="text" id="signupFullName" placeholder="Full Name" required>
+        <input type="date" id="signupDob" required>
+        <input type="text" id="signupMobile" placeholder="Mobile Number" required>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Password" required>
+        <button type="submit">Signup</button>
+      </form>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profileSection" class="container hidden">
+      <div id="profile">
+        <div id="profileDp" class="profile-dp"></div>
+        <h2 id="profileName"></h2>
+        <p id="profileEmail"></p>
+        <p id="profileMobile"></p>
+        <button id="editProfile">Edit Profile</button>
+        <button id="logout">Logout</button>
+      </div>
+    </div>
+
+    <!-- Edit Section -->
+    <div id="editSection" class="container hidden">
+      <h1>Edit Profile</h1>
+      <form id="editForm">
+        <input type="file" id="editProfilePic" accept="image/*">
+        <input type="text" id="editFullName" placeholder="Full Name" required>
+        <input type="date" id="editDob" required>
+        <input type="text" id="editMobile" placeholder="Mobile Number" required>
+        <input type="email" id="editEmail" placeholder="Email" required>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
