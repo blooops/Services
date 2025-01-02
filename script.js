@@ -1,207 +1,134 @@
-// Utility function to save data to localStorage
-function saveData(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-}
+document.addEventListener("DOMContentLoaded", () => {
+  const app = document.getElementById("app");
+  const loginSection = document.getElementById("loginSection");
+  const passwordSection = document.getElementById("passwordSection");
+  const signupSection = document.getElementById("signupSection");
+  const profileSection = document.getElementById("profileSection");
+  const editSection = document.getElementById("editSection");
 
-// Utility function to retrieve data from localStorage
-function getData(key) {
-    return JSON.parse(localStorage.getItem(key));
-}
+  const userData = JSON.parse(localStorage.getItem("userData")) || {};
 
-// Redirect to password.html if user is already logged in
-window.onload = () => {
-    const loggedInUser = getData("loggedInUser");
-    if (loggedInUser) {
-        window.location.href = "password.html";
-    }
-};
+  function showSection(section) {
+    [...app.children].forEach(child => child.classList.add("hidden"));
+    section.classList.remove("hidden");
+  }
 
-// Index.html: Login functionality
-if (document.querySelector("#loginForm")) {
-    document.querySelector("#loginForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const identifier = document.querySelector("#identifier").value;
-        const users = getData("users") || [];
-        const user = users.find(
-            (user) => user.email === identifier || user.mobile === identifier
-        );
+  if (userData.loggedIn) {
+    showSection(profileSection);
+    loadProfile(userData);
+  } else {
+    showSection(loginSection);
+  }
 
-        if (user) {
-            saveData("currentUser", user);
-            window.location.href = "password.html";
-        } else {
-            alert("User not registered. Redirecting to signup...");
-            window.location.href = "signup.html";
-        }
-    });
-}
-
-// Password.html: Password validation
-if (document.querySelector("#passwordForm")) {
-    const currentUser = getData("currentUser");
-    if (!currentUser) {
-        window.location.href = "index.html";
+  document.getElementById("loginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const identifier = document.getElementById("loginIdentifier").value;
+    if (identifier === userData.email || identifier === userData.mobile) {
+      showSection(passwordSection);
+      document.getElementById("passwordName").textContent = userData.fullName;
     } else {
-        document.querySelector("#userName").textContent = currentUser.fullName;
-
-        document
-            .querySelector("#passwordForm")
-            .addEventListener("submit", (e) => {
-                e.preventDefault();
-                const password = document.querySelector("#password").value;
-
-                if (password === currentUser.password) {
-                    saveData("loggedInUser", currentUser);
-                    window.location.href = "profile.html";
-                } else {
-                    alert("Incorrect password!");
-                }
-            });
+      showSection(signupSection);
     }
-}
+  });
 
-// Signup.html: Signup functionality
-if (document.querySelector("#signupForm")) {
-    document.querySelector("#signupForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const profilePic = document.querySelector("#profilePic").files[0];
-        const fullName = document.querySelector("#fullName").value;
-        const dob = document.querySelector("#dob").value;
-        const mobile = document.querySelector("#mobile").value;
-        const email = document.querySelector("#email").value;
-        const password = document.querySelector("#signupPassword").value;
-
-        const users = getData("users") || [];
-        const existingUser = users.find(
-            (user) => user.email === email || user.mobile === mobile
-        );
-
-        if (existingUser) {
-            alert("User already registered!");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function () {
-            const profilePicUrl = profilePic ? reader.result : null;
-            const newUser = {
-                profilePic: profilePicUrl,
-                fullName,
-                dob,
-                mobile,
-                email,
-                password,
-            };
-
-            users.push(newUser);
-            saveData("users", users);
-            saveData("currentUser", newUser);
-            alert("Signup successful!");
-            window.location.href = "profile.html";
-        };
-
-        if (profilePic) {
-            reader.readAsDataURL(profilePic);
-        } else {
-            reader.onload();
-        }
-    });
-}
-
-// Profile.html: Display user details
-if (document.querySelector(".profile-box")) {
-    const loggedInUser = getData("loggedInUser");
-
-    if (!loggedInUser) {
-        window.location.href = "index.html";
+  document.getElementById("passwordForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const password = document.getElementById("loginPassword").value;
+    if (password === userData.password) {
+      userData.loggedIn = true;
+      localStorage.setItem("userData", JSON.stringify(userData));
+      showSection(profileSection);
+      loadProfile(userData);
     } else {
-        const profileDp = document.querySelector("#profileDp");
-        const profileName = document.querySelector("#profileName");
-        const profileEmail = document.querySelector("#profileEmail");
-        const profileMobile = document.querySelector("#profileMobile");
-
-        if (loggedInUser.profilePic) {
-            profileDp.style.backgroundImage = `url(${loggedInUser.profilePic})`;
-            profileDp.style.backgroundSize = "cover";
-        } else {
-            const initials = loggedInUser.fullName
-                .split(" ")
-                .map((n) => n[0])
-                .join("");
-            profileDp.textContent = initials;
-            profileDp.style.backgroundColor = `#${Math.floor(
-                Math.random() * 16777215
-            ).toString(16)}`;
-        }
-
-        profileName.textContent = loggedInUser.fullName;
-        profileEmail.textContent = loggedInUser.email;
-        profileMobile.textContent = loggedInUser.mobile;
-
-        document.querySelector("#editProfile").addEventListener("click", () => {
-            window.location.href = "edit.html";
-        });
-
-        document.querySelector("#logout").addEventListener("click", () => {
-            localStorage.removeItem("loggedInUser");
-            window.location.href = "index.html";
-        });
+      alert("Incorrect password");
     }
-}
+  });
 
-// Edit.html: Edit user details
-if (document.querySelector("#editForm")) {
-    const loggedInUser = getData("loggedInUser");
+  document.getElementById("signupForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fullName = document.getElementById("signupFullName").value;
+    const dob = document.getElementById("signupDob").value;
+    const mobile = document.getElementById("signupMobile").value;
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+    const profilePic = document.getElementById("signupProfilePic").files[0];
 
-    if (!loggedInUser) {
-        window.location.href = "index.html";
+    userData.fullName = fullName;
+    userData.dob = dob;
+    userData.mobile = mobile;
+    userData.email = email;
+    userData.password = password;
+
+    if (profilePic) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        userData.profilePic = reader.result;
+        saveUserData();
+        showSection(profileSection);
+        loadProfile(userData);
+      };
+      reader.readAsDataURL(profilePic);
     } else {
-        document.querySelector("#editFullName").value = loggedInUser.fullName;
-        document.querySelector("#editDob").value = loggedInUser.dob;
-        document.querySelector("#editMobile").value = loggedInUser.mobile;
-        document.querySelector("#editEmail").value = loggedInUser.email;
-
-        document
-            .querySelector("#editForm")
-            .addEventListener("submit", (e) => {
-                e.preventDefault();
-
-                const profilePic = document.querySelector("#editProfilePic").files[0];
-                const fullName = document.querySelector("#editFullName").value;
-                const dob = document.querySelector("#editDob").value;
-                const mobile = document.querySelector("#editMobile").value;
-                const email = document.querySelector("#editEmail").value;
-
-                const reader = new FileReader();
-                reader.onload = function () {
-                    const profilePicUrl = profilePic ? reader.result : loggedInUser.profilePic;
-                    const updatedUser = {
-                        profilePic: profilePicUrl,
-                        fullName,
-                        dob,
-                        mobile,
-                        email,
-                        password: loggedInUser.password,
-                    };
-
-                    const users = getData("users");
-                    const userIndex = users.findIndex(
-                        (user) => user.email === loggedInUser.email
-                    );
-
-                    users[userIndex] = updatedUser;
-                    saveData("users", users);
-                    saveData("loggedInUser", updatedUser);
-                    alert("Profile updated successfully!");
-                    window.location.href = "profile.html";
-                };
-
-                if (profilePic) {
-                    reader.readAsDataURL(profilePic);
-                } else {
-                    reader.onload();
-                }
-            });
+      userData.profilePic = null;
+      saveUserData();
+      showSection(profileSection);
+      loadProfile(userData);
     }
-}
+  });
+
+  document.getElementById("editProfile").addEventListener("click", () => {
+    showSection(editSection);
+    document.getElementById("editFullName").value = userData.fullName;
+    document.getElementById("editDob").value = userData.dob;
+    document.getElementById("editMobile").value = userData.mobile;
+    document.getElementById("editEmail").value = userData.email;
+  });
+
+  document.getElementById("editForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fullName = document.getElementById("editFullName").value;
+    const dob = document.getElementById("editDob").value;
+    const mobile = document.getElementById("editMobile").value;
+    const email = document.getElementById("editEmail").value;
+    const profilePic = document.getElementById("editProfilePic").files[0];
+
+    userData.fullName = fullName;
+    userData.dob = dob;
+    userData.mobile = mobile;
+    userData.email = email;
+
+    if (profilePic) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        userData.profilePic = reader.result;
+        saveUserData();
+        showSection(profileSection);
+        loadProfile(userData);
+      };
+      reader.readAsDataURL(profilePic);
+    } else {
+      saveUserData();
+      showSection(profileSection);
+      loadProfile(userData);
+    }
+  });
+
+  document.getElementById("logout").addEventListener("click", () => {
+    userData.loggedIn = false;
+    localStorage.setItem("userData", JSON.stringify(userData));
+    showSection(loginSection);
+  });
+
+  function saveUserData() {
+    localStorage.setItem("userData", JSON.stringify(userData));
+  }
+
+  function loadProfile(data) {
+    document.getElementById("profileDp").style.backgroundImage = data.profilePic
+      ? `url(${data.profilePic})`
+      : "";
+    document.getElementById("profileName").textContent = data.fullName;
+    document.getElementById("profileEmail").textContent = data.email;
+    document.getElementById("profileMobile").textContent = data.mobile;
+  }
+});
