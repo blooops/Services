@@ -1,22 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Profile</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="profile-box">
-            <div id="profileDp" class="dp-placeholder"></div>
-            <h1 id="profileName"></h1>
-            <p id="profileEmail"></p>
-            <p id="profileMobile"></p>
-            <button id="editProfile">Edit Profile</button>
-            <button id="logout">Logout</button>
-        </div>
+  <div id="profileContainer">
+    <div id="profileSection" class="container">
+      <div id="profile">
+        <div id="profileDp" class="profile-dp"></div>
+        <h2 id="profileName"></h2>
+        <p id="profileEmail"></p>
+        <p id="profileMobile"></p>
+        <button id="editProfile">Edit Profile</button>
+        <button id="logout">Logout</button>
+      </div>
     </div>
-    <script src="script.js"></script>
+
+    <div id="editSection" class="container hidden">
+      <h1>Edit Profile</h1>
+      <form id="editForm">
+        <input type="file" id="editProfilePic" accept="image/*">
+        <input type="text" id="editFullName" placeholder="Full Name" required>
+        <input type="date" id="editDob" required>
+        <input type="text" id="editMobile" placeholder="Mobile Number" required>
+        <input type="email" id="editEmail" placeholder="Email" required>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData || !userData.email) {
+      window.location.href = "auth.html";
+    } else {
+      loadProfile(userData);
+    }
+
+    document.getElementById("editProfile").addEventListener("click", () => {
+      document.getElementById("profileSection").classList.add("hidden");
+      document.getElementById("editSection").classList.remove("hidden");
+      document.getElementById("editFullName").value = userData.fullName;
+      document.getElementById("editDob").value = userData.dob;
+      document.getElementById("editMobile").value = userData.mobile;
+      document.getElementById("editEmail").value = userData.email;
+    });
+
+    document.getElementById("editForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById("editFullName").value;
+      const dob = document.getElementById("editDob").value;
+      const mobile = document.getElementById("editMobile").value;
+      const email = document.getElementById("editEmail").value;
+      const profilePic = document.getElementById("editProfilePic").files[0];
+
+      userData.fullName = fullName;
+      userData.dob = dob;
+      userData.mobile = mobile;
+      userData.email = email;
+
+      if (profilePic) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          userData.profilePic = reader.result;
+          saveUserData();
+          loadProfile(userData);
+        };
+        reader.readAsDataURL(profilePic);
+      } else {
+        saveUserData();
+        loadProfile(userData);
+      }
+
+      document.getElementById("editSection").classList.add("hidden");
+      document.getElementById("profileSection").classList.remove("hidden");
+    });
+
+    document.getElementById("logout").addEventListener("click", () => {
+      localStorage.removeItem("userData");
+      window.location.href = "auth.html";
+    });
+
+    function saveUserData() {
+      localStorage.setItem("userData", JSON.stringify(userData));
+    }
+
+    function loadProfile(data) {
+      document.getElementById("profileDp").style.backgroundImage = data.profilePic
+        ? `url(${data.profilePic})`
+        : "";
+      document.getElementById("profileName").textContent = data.fullName;
+      document.getElementById("profileEmail").textContent = data.email;
+      document.getElementById("profileMobile").textContent = data.mobile;
+    }
+  </script>
 </body>
 </html>
