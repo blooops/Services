@@ -8,15 +8,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>Edit Profile</h1>
-        <form id="editForm">
-            <input type="file" id="editProfilePic" accept="image/*">
-            <input type="text" id="editFullName" required>
-            <input type="date" id="editDob" required>
-            <input type="text" id="editMobile" required>
-            <input type="email" id="editEmail" required>
-            <button type="submit">Save Changes</button>
-        </form>
+        <div class="edit-box">
+            <h1>Edit Profile</h1>
+            <form id="editForm">
+                <input type="file" id="editProfilePic" accept="image/*">
+                <input type="text" id="editFullName" placeholder="Full Name" required>
+                <input type="date" id="editDob" required>
+                <input type="text" id="editMobile" placeholder="Mobile No" required>
+                <input type="email" id="editEmail" placeholder="Email ID" required>
+                <button type="submit">Save</button>
+            </form>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
