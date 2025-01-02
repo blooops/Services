@@ -3,94 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Login</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #121212;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
-            text-align: center;
-            width: 350px;
-        }
-        input, button {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 4px;
-            outline: none;
-            font-size: 16px;
-        }
-        input {
-            background: #2a2a2a;
-            color: #fff;
-        }
-        button {
-            background: #007bff;
-            color: #fff;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
-        <input type="text" id="identifier" placeholder="Email or Mobile Number">
-        <button onclick="login()">Next</button>
+        <h1>Login</h1>
+        <form id="loginForm">
+            <input type="text" id="identifier" placeholder="Email or Mobile No" required>
+            <button type="submit">Next</button>
+        </form>
     </div>
-    <script>
-        // Check if a user is already logged in by checking the session timestamp
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        const lastLogin = localStorage.getItem('lastLogin');
-
-        if (currentUser && lastLogin) {
-            const currentTime = new Date().getTime();
-            const timeDifference = currentTime - lastLogin;
-
-            // Check if the session is less than 30 days old (30 days * 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
-            if (timeDifference < 30 * 24 * 60 * 60 * 1000) {
-                // Session is still valid, redirect to password page
-                window.location.href = "password.html";
-            } else {
-                // Session expired, prompt user to log in again
-                localStorage.removeItem('currentUser');
-                localStorage.removeItem('lastLogin');
-            }
-        }
-
-        function login() {
-            const identifier = document.getElementById('identifier').value;
-            const users = JSON.parse(localStorage.getItem('users')) || {};
-
-            const user = Object.values(users).find(
-                (user) => user.email === identifier || user.mobile === identifier
-            );
-
-            if (!user) {
-                alert("User not found! Please sign up.");
-                window.location.href = "signup.html";
-                return;
-            }
-
-            // Save the user data temporarily in localStorage for the password step
-            localStorage.setItem('tempUser', JSON.stringify(user));
-            window.location.href = "password.html"; // Redirect to password page
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
