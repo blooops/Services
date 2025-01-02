@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Authentication System</title>
+  <title>Authentication</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Login Section -->
+  <div id="authContainer">
     <div id="loginSection" class="container">
       <h1>Login</h1>
       <form id="loginForm">
@@ -17,19 +16,6 @@
       </form>
     </div>
 
-    <!-- Password Section -->
-    <div id="passwordSection" class="container hidden">
-      <div id="passwordProfile">
-        <div id="passwordDp" class="profile-dp"></div>
-        <h2 id="passwordName"></h2>
-      </div>
-      <form id="passwordForm">
-        <input type="password" id="loginPassword" placeholder="Enter Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-
-    <!-- Signup Section -->
     <div id="signupSection" class="container hidden">
       <h1>Signup</h1>
       <form id="signupForm">
@@ -42,33 +28,56 @@
         <button type="submit">Signup</button>
       </form>
     </div>
-
-    <!-- Profile Section -->
-    <div id="profileSection" class="container hidden">
-      <div id="profile">
-        <div id="profileDp" class="profile-dp"></div>
-        <h2 id="profileName"></h2>
-        <p id="profileEmail"></p>
-        <p id="profileMobile"></p>
-        <button id="editProfile">Edit Profile</button>
-        <button id="logout">Logout</button>
-      </div>
-    </div>
-
-    <!-- Edit Section -->
-    <div id="editSection" class="container hidden">
-      <h1>Edit Profile</h1>
-      <form id="editForm">
-        <input type="file" id="editProfilePic" accept="image/*">
-        <input type="text" id="editFullName" placeholder="Full Name" required>
-        <input type="date" id="editDob" required>
-        <input type="text" id="editMobile" placeholder="Mobile Number" required>
-        <input type="email" id="editEmail" placeholder="Email" required>
-        <button type="submit">Save</button>
-      </form>
-    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const userData = JSON.parse(localStorage.getItem("userData")) || {};
+
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const identifier = document.getElementById("loginIdentifier").value;
+      if (identifier === userData.email || identifier === userData.mobile) {
+        window.location.href = "profile.html";
+      } else {
+        alert("User not registered. Please signup.");
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("signupSection").classList.remove("hidden");
+      }
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const profilePic = document.getElementById("signupProfilePic").files[0];
+      const fullName = document.getElementById("signupFullName").value;
+      const dob = document.getElementById("signupDob").value;
+      const mobile = document.getElementById("signupMobile").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+
+      userData.fullName = fullName;
+      userData.dob = dob;
+      userData.mobile = mobile;
+      userData.email = email;
+      userData.password = password;
+
+      if (profilePic) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          userData.profilePic = reader.result;
+          saveUserData();
+          window.location.href = "profile.html";
+        };
+        reader.readAsDataURL(profilePic);
+      } else {
+        userData.profilePic = null;
+        saveUserData();
+        window.location.href = "profile.html";
+      }
+    });
+
+    function saveUserData() {
+      localStorage.setItem("userData", JSON.stringify(userData));
+    }
+  </script>
 </body>
 </html>
