@@ -7,90 +7,143 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background-color: #f1f3f6;
         }
+
         header {
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
+            padding: 20px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
         }
+
         .logo {
             font-size: 1.5em;
+            font-weight: bold;
         }
+
         nav a {
             color: white;
             text-decoration: none;
-            margin: 0 10px;
+            margin: 0 15px;
+            font-size: 1.1em;
         }
+
         nav a.active {
+            color: #f8f9fa;
             font-weight: bold;
         }
+
         main {
+            margin-top: 70px;
             padding: 20px;
         }
+
         .balance {
-            font-size: 1.2em;
+            font-size: 1.3em;
             margin-bottom: 20px;
+            font-weight: bold;
         }
+
         form {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
         }
+
         input, button {
             padding: 10px;
             font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
+
         .btn-primary {
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
+
         .transaction-container {
-            margin-top: 20px;
+            margin-top: 30px;
         }
+
         .transaction-list {
             max-height: 200px;
             overflow-y: auto;
             border: 1px solid #ddd;
             padding: 10px;
+            border-radius: 10px;
         }
+
         .transaction-list li {
-            padding: 5px 0;
+            padding: 10px;
             border-bottom: 1px solid #ddd;
+            font-size: 1.1em;
         }
+
         .transaction-list li:last-child {
             border-bottom: none;
         }
+
         .recipient-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
+            gap: 15px;
             margin-top: 20px;
         }
+
         .recipient-card {
             background: #fff;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 15px;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .recipient-card img {
             border-radius: 50%;
             width: 60px;
             height: 60px;
             margin-bottom: 10px;
         }
+
+        .profile-card {
+            text-align: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 0 auto;
+        }
+
+        .profile-card img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
         .loading-screen {
             position: fixed;
             top: 0;
@@ -104,129 +157,153 @@
             align-items: center;
             font-size: 1.5em;
             display: none;
+            z-index: 999;
+        }
+
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">PayX</div>
-        <nav>
-            <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
-            <a href="#history"><i class="fas fa-history"></i> History</a>
-            <a href="#profile"><i class="fas fa-user"></i> Profile</a>
-            <a href="#recipients"><i class="fas fa-users"></i> Recipients</a>
-        </nav>
-    </header>
 
-    <main id="home">
-        <h1>Send Money</h1>
-        <div class="balance">
-            Balance: ₹<span id="balance">10,00,00,000</span>
-        </div>
-        <form id="sendMoneyForm">
-            <input type="text" id="receiver" placeholder="Enter Receiver's UPI ID" required>
-            <input type="number" id="amount" placeholder="Enter Amount (₹)" required>
-            <input type="password" id="pin" placeholder="Enter PIN" required>
-            <button type="submit" class="btn-primary">Send Money</button>
-        </form>
-        <div class="transaction-container">
-            <h2>Recent Transactions</h2>
-            <ul id="transactionList" class="transaction-list"></ul>
-        </div>
-    </main>
+<header>
+    <div class="logo">PayX</div>
+    <nav>
+        <a href="#" class="active" onclick="showPage('home')"><i class="fas fa-home"></i> Home</a>
+        <a href="#" onclick="showPage('history')"><i class="fas fa-history"></i> History</a>
+        <a href="#" onclick="showPage('profile')"><i class="fas fa-user"></i> Profile</a>
+        <a href="#" onclick="showPage('recipients')"><i class="fas fa-users"></i> Recipients</a>
+    </nav>
+</header>
 
-    <main id="recipients" style="display: none;">
-        <h1>Recipients</h1>
-        <div class="recipient-list" id="recipientList">
-            <!-- Recipients will be dynamically loaded -->
-        </div>
-    </main>
-
-    <main id="history" style="display: none;">
-        <h1>Transaction History</h1>
-        <ul id="allTransactions" class="transaction-list"></ul>
-    </main>
-
-    <main id="profile" style="display: none;">
-        <h1>Your Profile</h1>
-        <div class="profile-card">
-            <img src="https://via.placeholder.com/150" alt="User Profile">
-            <h2>Nikkhil</h2>
-            <p>UPI ID: nikkhil@upi</p>
-            <p>Balance: ₹<span id="profileBalance">10,00,00,000</span></p>
-        </div>
-    </main>
-
-    <div class="loading-screen" id="loadingScreen">
-        Processing Transaction <i class="fas fa-spinner"></i>
+<main id="home">
+    <h1>Send Money</h1>
+    <div class="balance">
+        Balance: ₹<span id="balance">10,00,00,000</span>
     </div>
+    <form id="sendMoneyForm">
+        <input type="text" id="receiver" placeholder="Enter Receiver's UPI ID" required>
+        <input type="number" id="amount" placeholder="Enter Amount (₹)" required>
+        <input type="password" id="pin" placeholder="Enter PIN" required>
+        <button type="submit" class="btn-primary">Send Money</button>
+    </form>
+    <div class="transaction-container">
+        <h2>Recent Transactions</h2>
+        <ul id="transactionList" class="transaction-list"></ul>
+    </div>
+</main>
 
-    <audio id="transactionSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<main id="recipients" style="display: none;">
+    <h1>Recipients</h1>
+    <div class="recipient-list" id="recipientList">
+        <!-- Recipients will be dynamically loaded here -->
+    </div>
+</main>
 
-    <script>
-        const recipients = [
-            { name: "John Doe", upi: "john@upi", dp: "https://via.placeholder.com/60" },
-            { name: "Jane Smith", upi: "jane@upi", dp: "https://via.placeholder.com/60" },
-            { name: "Alice Brown", upi: "alice@upi", dp: "https://via.placeholder.com/60" },
-        ];
+<main id="history" style="display: none;">
+    <h1>Transaction History</h1>
+    <ul id="allTransactions" class="transaction-list"></ul>
+</main>
 
-        const transactions = [];
-        const balanceElement = document.getElementById("balance");
-        const transactionSound = document.getElementById("transactionSound");
-        const recipientList = document.getElementById("recipientList");
-        const transactionList = document.getElementById("transactionList");
-        const allTransactions = document.getElementById("allTransactions");
-        const loadingScreen = document.getElementById("loadingScreen");
+<main id="profile" style="display: none;">
+    <h1>Your Profile</h1>
+    <div class="profile-card">
+        <img src="https://via.placeholder.com/100" alt="User Profile">
+        <h2>Nikkhil</h2>
+        <p>UPI ID: nikkhil@upi</p>
+        <p>Balance: ₹<span id="profileBalance">10,00,00,000</span></p>
+    </div>
+</main>
 
-        // Load Recipients
-        recipients.forEach((recipient) => {
-            const card = document.createElement("div");
-            card.classList.add("recipient-card");
-            card.innerHTML = `
-                <img src="${recipient.dp}" alt="${recipient.name}">
-                <h3>${recipient.name}</h3>
-                <p>${recipient.upi}</p>
-            `;
-            recipientList.appendChild(card);
-        });
+<div class="loading-screen" id="loadingScreen">
+    Processing Transaction <i class="fas fa-spinner fa-spin"></i>
+</div>
 
-        // Handle Transactions
-        document.getElementById("sendMoneyForm").addEventListener("submit", (e) => {
-            e.preventDefault();
-            const receiver = document.getElementById("receiver").value;
-            const amount = Number(document.getElementById("amount").value);
-            const pin = document.getElementById("pin").value;
+<audio id="transactionSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
 
-            if (pin !== "00000") {
-                alert("Invalid PIN!");
-                return;
-            }
+<footer>
+    <p>PayX &copy; 2025 - All rights reserved</p>
+</footer>
 
-            loadingScreen.style.display = "flex";
-            setTimeout(() => {
-                loadingScreen.style.display = "none";
-                const balance = Number(balanceElement.textContent.replace(/,/g, ""));
-                if (amount > balance) {
-                    alert("Insufficient Balance!");
-                } else {
-                    balanceElement.textContent = (balance - amount).toLocaleString();
-                    transactions.unshift({ receiver, amount, date: new Date().toLocaleString() });
-                    transactionSound.play();
-                    updateTransactionList();
-                }
-            }, 2000);
-        });
+<script>
+    const recipients = [
+        { name: "John Doe", upi: "john@upi", dp: "https://via.placeholder.com/60" },
+        { name: "Jane Smith", upi: "jane@upi", dp: "https://via.placeholder.com/60" },
+        { name: "Alice Brown", upi: "alice@upi", dp: "https://via.placeholder.com/60" },
+    ];
 
-        function updateTransactionList() {
-            transactionList.innerHTML = "";
-            allTransactions.innerHTML = "";
-            transactions.forEach((t, index) => {
-                const item = `<li>${t.date} - ${t.receiver}: ₹${t.amount}</li>`;
-                if (index < 5) transactionList.innerHTML += item;
-                allTransactions.innerHTML += item;
-            });
+    const transactions = [];
+    const balanceElement = document.getElementById("balance");
+    const transactionSound = document.getElementById("transactionSound");
+    const recipientList = document.getElementById("recipientList");
+    const transactionList = document.getElementById("transactionList");
+    const allTransactions = document.getElementById("allTransactions");
+    const loadingScreen = document.getElementById("loadingScreen");
+
+    // Load Recipients
+    recipients.forEach((recipient) => {
+        const card = document.createElement("div");
+        card.classList.add("recipient-card");
+        card.innerHTML = `
+            <img src="${recipient.dp}" alt="${recipient.name}">
+            <h3>${recipient.name}</h3>
+            <p>${recipient.upi}</p>
+        `;
+        recipientList.appendChild(card);
+    });
+
+    // Handle Transactions
+    document.getElementById("sendMoneyForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const receiver = document.getElementById("receiver").value;
+        const amount = Number(document.getElementById("amount").value);
+        const pin = document.getElementById("pin").value;
+
+        if (pin !== "00000") {
+            alert("Invalid PIN!");
+            return;
         }
-    </script>
+
+        loadingScreen.style.display = "flex";
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+            const balance = Number(balanceElement.textContent.replace(/,/g, ""));
+            if (amount > balance) {
+                alert("Insufficient Balance!");
+            } else {
+                balanceElement.textContent = (balance - amount).toLocaleString();
+                transactions.unshift({ receiver, amount, date: new Date().toLocaleString() });
+                transactionSound.play();
+                updateTransactionList();
+            }
+        }, 2000);
+    });
+
+    function updateTransactionList() {
+        transactionList.innerHTML = "";
+        allTransactions.innerHTML = "";
+        transactions.forEach((t, index) => {
+            const item = `<li>${t.date} - ${t.receiver}: ₹${t.amount}</li>`;
+            if (index < 5) transactionList.innerHTML += item;
+            allTransactions.innerHTML += item;
+        });
+    }
+
+    function showPage(page) {
+        document.querySelectorAll("main").forEach(main => main.style.display = "none");
+        document.getElementById(page).style.display = "block";
+        document.querySelectorAll("nav a").forEach(a => a.classList.remove("active"));
+        document.querySelector(`nav a[href='#${page}']`).classList.add("active");
+    }
+</script>
+
 </body>
 </html>
 
