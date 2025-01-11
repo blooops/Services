@@ -3,22 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PayX - Send Money</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>PayX - All-in-One</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 1.5em;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        nav a.active {
+            font-weight: bold;
+        }
+        main {
+            padding: 20px;
+        }
+        .balance {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 1em;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .transaction-container {
+            margin-top: 20px;
+        }
+        .transaction-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .transaction-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .transaction-list li:last-child {
+            border-bottom: none;
+        }
+        .recipient-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .recipient-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+        .recipient-card img {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="logo">PayX</div>
         <nav>
-            <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
-            <a href="history.html"><i class="fas fa-history"></i> History</a>
-            <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
-            <a href="data.html"><i class="fas fa-users"></i> Recipients</a>
+            <a href="#" class="active"><i class="fas fa-home"></i> Home</a>
+            <a href="#history"><i class="fas fa-history"></i> History</a>
+            <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+            <a href="#recipients"><i class="fas fa-users"></i> Recipients</a>
         </nav>
     </header>
 
-    <main>
+    <main id="home">
         <h1>Send Money</h1>
         <div class="balance">
             Balance: ₹<span id="balance">10,00,00,000</span>
@@ -29,13 +129,104 @@
             <input type="password" id="pin" placeholder="Enter PIN" required>
             <button type="submit" class="btn-primary">Send Money</button>
         </form>
+        <div class="transaction-container">
+            <h2>Recent Transactions</h2>
+            <ul id="transactionList" class="transaction-list"></ul>
+        </div>
     </main>
 
-    <div id="loadingScreen" class="loading-screen hidden">
+    <main id="recipients" style="display: none;">
+        <h1>Recipients</h1>
+        <div class="recipient-list" id="recipientList">
+            <!-- Recipients will be dynamically loaded -->
+        </div>
+    </main>
+
+    <main id="history" style="display: none;">
+        <h1>Transaction History</h1>
+        <ul id="allTransactions" class="transaction-list"></ul>
+    </main>
+
+    <main id="profile" style="display: none;">
+        <h1>Your Profile</h1>
+        <div class="profile-card">
+            <img src="https://via.placeholder.com/150" alt="User Profile">
+            <h2>Nikkhil</h2>
+            <p>UPI ID: nikkhil@upi</p>
+            <p>Balance: ₹<span id="profileBalance">10,00,00,000</span></p>
+        </div>
+    </main>
+
+    <div class="loading-screen" id="loadingScreen">
         Processing Transaction <i class="fas fa-spinner"></i>
     </div>
 
-    <audio id="transactionSound" src="sounds/transaction.mp3"></audio>
-    <script src="script.js"></script>
+    <audio id="transactionSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+
+    <script>
+        const recipients = [
+            { name: "John Doe", upi: "john@upi", dp: "https://via.placeholder.com/60" },
+            { name: "Jane Smith", upi: "jane@upi", dp: "https://via.placeholder.com/60" },
+            { name: "Alice Brown", upi: "alice@upi", dp: "https://via.placeholder.com/60" },
+        ];
+
+        const transactions = [];
+        const balanceElement = document.getElementById("balance");
+        const transactionSound = document.getElementById("transactionSound");
+        const recipientList = document.getElementById("recipientList");
+        const transactionList = document.getElementById("transactionList");
+        const allTransactions = document.getElementById("allTransactions");
+        const loadingScreen = document.getElementById("loadingScreen");
+
+        // Load Recipients
+        recipients.forEach((recipient) => {
+            const card = document.createElement("div");
+            card.classList.add("recipient-card");
+            card.innerHTML = `
+                <img src="${recipient.dp}" alt="${recipient.name}">
+                <h3>${recipient.name}</h3>
+                <p>${recipient.upi}</p>
+            `;
+            recipientList.appendChild(card);
+        });
+
+        // Handle Transactions
+        document.getElementById("sendMoneyForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const receiver = document.getElementById("receiver").value;
+            const amount = Number(document.getElementById("amount").value);
+            const pin = document.getElementById("pin").value;
+
+            if (pin !== "00000") {
+                alert("Invalid PIN!");
+                return;
+            }
+
+            loadingScreen.style.display = "flex";
+            setTimeout(() => {
+                loadingScreen.style.display = "none";
+                const balance = Number(balanceElement.textContent.replace(/,/g, ""));
+                if (amount > balance) {
+                    alert("Insufficient Balance!");
+                } else {
+                    balanceElement.textContent = (balance - amount).toLocaleString();
+                    transactions.unshift({ receiver, amount, date: new Date().toLocaleString() });
+                    transactionSound.play();
+                    updateTransactionList();
+                }
+            }, 2000);
+        });
+
+        function updateTransactionList() {
+            transactionList.innerHTML = "";
+            allTransactions.innerHTML = "";
+            transactions.forEach((t, index) => {
+                const item = `<li>${t.date} - ${t.receiver}: ₹${t.amount}</li>`;
+                if (index < 5) transactionList.innerHTML += item;
+                allTransactions.innerHTML += item;
+            });
+        }
+    </script>
 </body>
 </html>
+
