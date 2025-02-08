@@ -12,41 +12,11 @@
         }
         body {
             background-color: black;
-            color: white;
-            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             overflow: hidden;
-        }
-        #inputContainer {
-            position: absolute;
-            top: 20px;
-            width: calc(100% - 40px);
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        input {
-            width: 70%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #555;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            background: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background: #0056b3;
         }
         iframe {
             position: absolute;
@@ -55,31 +25,30 @@
             right: 20px;
             bottom: 20px;
             width: calc(100vw - 40px);
-            height: calc(100vh - 80px); /* 20px input + 20px margin */
+            height: calc(100vh - 40px);
             border: none;
-            display: none; /* Hidden initially */
         }
     </style>
 </head>
 <body>
-    <div id="inputContainer">
-        <input type="text" id="urlInput" placeholder="Enter your link (https://example.com)">
-        <button onclick="embedLink()">Embed</button>
-    </div>
     <iframe id="embeddedPage"></iframe>
 
     <script>
-        function embedLink() {
-            let url = document.getElementById("urlInput").value.trim();
-            
-            // Ensure the URL starts with http:// or https://
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://" + url;
+        function getEmbeddedURL() {
+            let path = window.location.pathname.substring(1); // Get everything after "/"
+
+            if (!path) {
+                document.body.innerHTML = "<h2 style='color: white;'>No URL provided in the path!</h2>";
+                return;
             }
 
-            document.getElementById("embeddedPage").src = url;
-            document.getElementById("embeddedPage").style.display = "block"; // Show iframe
+            // Ensure the URL starts with http:// or https://
+            let fullURL = path.startsWith("http") ? path : "https://" + path;
+
+            document.getElementById("embeddedPage").src = fullURL;
         }
+
+        getEmbeddedURL();
     </script>
 </body>
 </html>
