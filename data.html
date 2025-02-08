@@ -34,21 +34,28 @@
     <iframe id="embeddedPage"></iframe>
 
     <script>
-        function getEmbeddedURL() {
-            let path = window.location.pathname.substring(1); // Get everything after "/"
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
 
-            if (!path) {
-                document.body.innerHTML = "<h2 style='color: white;'>No URL provided in the path!</h2>";
+        function loadEmbeddedPage() {
+            let url = getQueryParam("p");
+
+            if (!url) {
+                document.body.innerHTML = "<h2 style='color: white;'>No URL provided in the 'p' parameter!</h2>";
                 return;
             }
 
             // Ensure the URL starts with http:// or https://
-            let fullURL = path.startsWith("http") ? path : "https://" + path;
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://" + url;
+            }
 
-            document.getElementById("embeddedPage").src = fullURL;
+            document.getElementById("embeddedPage").src = url;
         }
 
-        getEmbeddedURL();
+        loadEmbeddedPage();
     </script>
 </body>
 </html>
