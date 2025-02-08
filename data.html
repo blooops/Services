@@ -1,90 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#008000"> <!-- Green reload bar color -->
-  <title>Address Bar, Loading & Reload Color</title>
-  <style>
-    /* General Styling */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
-      display: none; /* Hidden initially to show the loading screen */
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    h1 {
-      color: #00ff00;
-      text-shadow: 0 0 10px #000000;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #333;
-      border: none;
-      color: #fff;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #555;
-    }
-
-    /* Loading Screen Styling */
-    #loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: red;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    #loading h1 {
-      color: #fff;
-      font-size: 2rem;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypted Link Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-align: center;
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div id="loading">
-    <h1>Loading...</h1>
-  </div>
+    <div class="container" id="output">Loading...</div>
 
-  <!-- Main Content -->
-  <div>
-    <h1>Welcome!</h1>
-    <button onclick="showMessage()">Click Me</button>
-  </div>
+    <script>
+        function getPath() {
+            return window.location.pathname.substring(1); // Get everything after "/"
+        }
 
-  <script>
-    // JavaScript Functionality
-    function showMessage() {
-      alert('Hello! This is an example with a green reload bar, pink loading screen, and black address bar.');
-    }
+        function encryptText(text) {
+            return btoa(text); // Base64 encode
+        }
 
-    // Simulate loading
-    window.addEventListener('load', () => {
-      const loadingScreen = document.getElementById('loading');
-      setTimeout(() => {
-        loadingScreen.style.display = 'none'; // Hide loading screen
-        document.body.style.display = 'flex'; // Show main content
-      }, 2000); // Loading screen duration (2 seconds)
-    });
-  </script>
+        function displayEncryptedLink() {
+            let userInput = getPath();
+            let encryptedText = userInput ? encryptText(userInput) : "No input found!";
+            document.getElementById("output").innerText = "Encrypted: " + encryptedText;
+        }
+
+        displayEncryptedLink();
+    </script>
 </body>
 </html>
