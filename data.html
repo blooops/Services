@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encrypted Link Page</title>
+    <title>Embed Any Link</title>
     <style>
         * {
             margin: 0;
@@ -11,51 +11,75 @@
             box-sizing: border-box;
         }
         body {
-            background-color: #111;
+            background-color: black;
             color: white;
             font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             overflow: hidden;
         }
-        .container {
+        #inputContainer {
+            position: absolute;
+            top: 20px;
+            width: calc(100% - 40px);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        input {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        iframe {
             position: absolute;
             top: 20px;
             left: 20px;
             right: 20px;
             bottom: 20px;
-            background: #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            text-align: center;
-            border-radius: 10px;
-            padding: 20px;
+            width: calc(100vw - 40px);
+            height: calc(100vh - 80px); /* 20px input + 20px margin */
+            border: none;
+            display: none; /* Hidden initially */
         }
     </style>
 </head>
 <body>
-    <div class="container" id="output">Loading...</div>
+    <div id="inputContainer">
+        <input type="text" id="urlInput" placeholder="Enter your link (https://example.com)">
+        <button onclick="embedLink()">Embed</button>
+    </div>
+    <iframe id="embeddedPage"></iframe>
 
     <script>
-        function getPath() {
-            return window.location.pathname.substring(1); // Get everything after "/"
-        }
+        function embedLink() {
+            let url = document.getElementById("urlInput").value.trim();
+            
+            // Ensure the URL starts with http:// or https://
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://" + url;
+            }
 
-        function encryptText(text) {
-            return btoa(text); // Base64 encode
+            document.getElementById("embeddedPage").src = url;
+            document.getElementById("embeddedPage").style.display = "block"; // Show iframe
         }
-
-        function displayEncryptedLink() {
-            let userInput = getPath();
-            let encryptedText = userInput ? encryptText(userInput) : "No input found!";
-            document.getElementById("output").innerText = "Encrypted: " + encryptedText;
-        }
-
-        displayEncryptedLink();
     </script>
 </body>
 </html>
