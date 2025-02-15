@@ -67,6 +67,7 @@
 
         if (newCode.length === 6) {
             localStorage.setItem("parentCode", newCode);
+            localStorage.removeItem("attempts");  // Reset attempts if a new code is set
             alert("Code set successfully!");
         } else {
             alert("Please enter a full 6-digit code.");
