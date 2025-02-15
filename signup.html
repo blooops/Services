@@ -3,24 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
     <title>Signup</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+        }
+        .container {
+            width: 350px;
+            padding: 20px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+        }
+        button { background: #1db954; cursor: pointer; }
+        .dp-container img {
+            width: 60px; height: 60px; border-radius: 50%;
+            cursor: pointer; margin: 5px;
+            border: 2px solid transparent;
+        }
+        .dp-container img.selected {
+            border: 3px solid #1db954;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="signup-box">
-            <h1>Signup</h1>
-            <form id="signupForm">
-                <input type="file" id="profilePic" accept="image/*">
-                <input type="text" id="fullName" placeholder="Full Name" required>
-                <input type="date" id="dob" required>
-                <input type="text" id="mobile" placeholder="Mobile No" required>
-                <input type="email" id="email" placeholder="Email ID" required>
-                <input type="password" id="signupPassword" placeholder="Password" required>
-                <button type="submit">Sign Up</button>
-            </form>
+        <h2>Signup</h2>
+        <input type="text" id="fullName" placeholder="Full Name">
+        <input type="text" id="userInput" placeholder="Email or Phone">
+        <input type="password" id="password" placeholder="Create Password">
+
+        <h4>Select Profile Picture:</h4>
+        <div class="dp-container">
+            <img src="https://img1.hotstarext.com/image/upload/w_200,h_200,c_fill/v1/feature/profile/37.png" onclick="selectDP(this)">
+            <img src="https://img1.hotstarext.com/image/upload/w_200,h_200,c_fill/v1/feature/profile/27.png" onclick="selectDP(this)">
+            <img src="https://img1.hotstarext.com/image/upload/w_200,h_200,c_fill/feature/profile/21.png" onclick="selectDP(this)">
         </div>
+
+        <button onclick="signup()">Signup</button>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        let selectedDP = "";
+        function selectDP(img) {
+            selectedDP = img.src;
+            document.querySelectorAll(".dp-container img").forEach(i => i.classList.remove("selected"));
+            img.classList.add("selected");
+        }
+
+        function signup() {
+            let fullName = document.getElementById("fullName").value;
+            let userInput = document.getElementById("userInput").value;
+            let password = document.getElementById("password").value;
+
+            if (!fullName || !userInput || !password || !selectedDP) {
+                alert("All fields are required!");
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem("users")) || {};
+            if (users[userInput]) {
+                alert("User already exists!");
+                return;
+            }
+
+            users[userInput] = { fullName, password, dp: selectedDP };
+            localStorage.setItem("users", JSON.stringify(users));
+            alert("Signup successful!");
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>
