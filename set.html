@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Parent Code</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .code-box {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            text-align: center;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            outline: none;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Set a 6-Digit Parent Code</h2>
+<div class="code-box">
+    <input type="text" maxlength="1" oninput="moveNext(this, 0)">
+    <input type="text" maxlength="1" oninput="moveNext(this, 1)">
+    <input type="text" maxlength="1" oninput="moveNext(this, 2)">
+    <input type="text" maxlength="1" oninput="moveNext(this, 3)">
+    <input type="text" maxlength="1" oninput="moveNext(this, 4)">
+    <input type="text" maxlength="1" oninput="moveNext(this, 5)">
+</div>
+<button onclick="setCode()">Save Code</button>
+
+<script>
+    function moveNext(input, index) {
+        if (input.value.length === 1 && index < 5) {
+            document.querySelectorAll("input")[index + 1].focus();
+        }
+    }
+
+    function setCode() {
+        let inputs = document.querySelectorAll("input");
+        let newCode = Array.from(inputs).map(input => input.value).join("");
+
+        if (newCode.length === 6) {
+            localStorage.setItem("parentCode", newCode);
+            alert("Code set successfully!");
+        } else {
+            alert("Please enter a full 6-digit code.");
+        }
+    }
+</script>
+
+</body>
+</html>
