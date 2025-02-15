@@ -3,29 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
+    <title>Login</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+        }
+        .container {
+            width: 350px;
+            padding: 20px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 5px;
+            border: none;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+        }
+        button { background: #1db954; cursor: pointer; }
+        .dp-container img {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 3px solid #1db954; display: none;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div>
-        <h2>Welcome, <span id="userName"></span></h2>
-        <img id="userDP" src="" width="100" height="100">
-        <button onclick="logout()">Logout</button>
-        <button onclick="window.location.href='edit-profile.html'">Edit Profile</button>
+    <div class="container">
+        <h2>Login</h2>
+        <div class="dp-container">
+            <img id="userDP" src="" alt="Profile DP">
+            <h3 id="userName" style="display:none;"></h3>
+        </div>
+
+        <input type="text" id="userInput" placeholder="Enter Email or Phone">
+        <button onclick="checkUser()">Next</button>
+
+        <input type="password" id="password" placeholder="Enter Password" style="display:none;">
+        <button id="loginBtn" style="display:none;" onclick="login()">Login</button>
+
+        <p>New User? <a href="signup.html">Signup</a></p>
     </div>
 
     <script>
         let users = JSON.parse(localStorage.getItem("users")) || {};
         let loggedInUser = localStorage.getItem("loggedInUser");
 
-        if (!loggedInUser) window.location.href = "index.html";
-        else {
-            document.getElementById("userName").innerText = users[loggedInUser].fullName;
-            document.getElementById("userDP").src = users[loggedInUser].dp;
+        if (loggedInUser) {
+            window.location.href = "abc.xyz";  // Redirect if already logged in
         }
 
-        function logout() {
-            localStorage.removeItem("loggedInUser");
-            window.location.href = "index.html";
+        function checkUser() {
+            let input = document.getElementById("userInput").value;
+            if (users[input]) {
+                document.getElementById("userDP").src = users[input].dp;
+                document.getElementById("userDP").style.display = "block";
+                document.getElementById("userName").innerText = users[input].fullName;
+                document.getElementById("userName").style.display = "block";
+                document.getElementById("password").style.display = "block";
+                document.getElementById("loginBtn").style.display = "block";
+            } else {
+                alert("User not registered!");
+                window.location.href = "signup.html";
+            }
+        }
+
+        function login() {
+            let input = document.getElementById("userInput").value;
+            let password = document.getElementById("password").value;
+
+            if (users[input].password === password) {
+                localStorage.setItem("loggedInUser", input);
+                window.location.href = "abc.xyz";
+            } else {
+                alert("Incorrect password!");
+            }
         }
     </script>
 </body>
