@@ -1,134 +1,56 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const app = document.getElementById("app");
-  const loginSection = document.getElementById("loginSection");
-  const passwordSection = document.getElementById("passwordSection");
-  const signupSection = document.getElementById("signupSection");
-  const profileSection = document.getElementById("profileSection");
-  const editSection = document.getElementById("editSection");
+let users = JSON.parse(localStorage.getItem("users")) || {};
+let loggedInUser = localStorage.getItem("loggedInUser");
 
-  const userData = JSON.parse(localStorage.getItem("userData")) || {};
+// Redirect if logged in (except profile page)
+if (loggedInUser && !window.location.href.includes("profile.html") && !window.location.href.includes("logout.html")) {
+    window.location.href = "https://coldhotstar.framer.ai/home_type";
+}
 
-  function showSection(section) {
-    [...app.children].forEach(child => child.classList.add("hidden"));
-    section.classList.remove("hidden");
-  }
+function maskInfo(input) {
+    return input.includes("@") 
+        ? input[0] + "****@" + input.split("@")[1] 
+        : "+91" + input.slice(0, 2) + "******" + input.slice(-2);
+}
 
-  if (userData.loggedIn) {
-    showSection(profileSection);
-    loadProfile(userData);
-  } else {
-    showSection(loginSection);
-  }
-
-  document.getElementById("loginForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const identifier = document.getElementById("loginIdentifier").value;
-    if (identifier === userData.email || identifier === userData.mobile) {
-      showSection(passwordSection);
-      document.getElementById("passwordName").textContent = userData.fullName;
+function checkUser() {
+    let input = document.getElementById("userInput").value.trim();
+    if (users[input]) {
+        document.getElementById("userDP").src = users[input].dp;
+        document.getElementById("userDP").style.display = "block";
+        document.getElementById("userName").innerText = users[input].fullName;
+        document.getElementById("maskedInfo").innerText = maskInfo(input);
+        document.getElementById("password").style.display = "block";
+        document.getElementById("loginBtn").style.display = "block";
+        document.getElementById("nextBtn").style.display = "none";
     } else {
-      showSection(signupSection);
+        alert("User not registered!");
+        window.location.href = "signup.html";
     }
-  });
+}
 
-  document.getElementById("passwordForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const password = document.getElementById("loginPassword").value;
-    if (password === userData.password) {
-      userData.loggedIn = true;
-      localStorage.setItem("userData", JSON.stringify(userData));
-      showSection(profileSection);
-      loadProfile(userData);
+function login() {
+    let input = document.getElementById("userInput").value.trim();
+    let password = document.getElementById("password").value;
+    if (users[input].password === password) {
+        localStorage.setItem("loggedInUser", input);
+        window.location.href = "https://coldhotstar.framer.ai/home_type";
     } else {
-      alert("Incorrect password");
+        alert("Incorrect password!");
     }
-  });
+}
 
-  document.getElementById("signupForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const fullName = document.getElementById("signupFullName").value;
-    const dob = document.getElementById("signupDob").value;
-    const mobile = document.getElementById("signupMobile").value;
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const profilePic = document.getElementById("signupProfilePic").files[0];
+function signup() {
+    let emailOrPhone = document.getElementById("emailOrPhone").value.trim();
+    users[emailOrPhone] = {
+        fullName: document.getElementById("fullName").value,
+        password: document.getElementById("password").value,
+        dp: selectedDP
+    };
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Signup Successful!");
+    window.location.href = "index.html";
+}
 
-    userData.fullName = fullName;
-    userData.dob = dob;
-    userData.mobile = mobile;
-    userData.email = email;
-    userData.password = password;
-
-    if (profilePic) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        userData.profilePic = reader.result;
-        saveUserData();
-        showSection(profileSection);
-        loadProfile(userData);
-      };
-      reader.readAsDataURL(profilePic);
-    } else {
-      userData.profilePic = null;
-      saveUserData();
-      showSection(profileSection);
-      loadProfile(userData);
-    }
-  });
-
-  document.getElementById("editProfile").addEventListener("click", () => {
-    showSection(editSection);
-    document.getElementById("editFullName").value = userData.fullName;
-    document.getElementById("editDob").value = userData.dob;
-    document.getElementById("editMobile").value = userData.mobile;
-    document.getElementById("editEmail").value = userData.email;
-  });
-
-  document.getElementById("editForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const fullName = document.getElementById("editFullName").value;
-    const dob = document.getElementById("editDob").value;
-    const mobile = document.getElementById("editMobile").value;
-    const email = document.getElementById("editEmail").value;
-    const profilePic = document.getElementById("editProfilePic").files[0];
-
-    userData.fullName = fullName;
-    userData.dob = dob;
-    userData.mobile = mobile;
-    userData.email = email;
-
-    if (profilePic) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        userData.profilePic = reader.result;
-        saveUserData();
-        showSection(profileSection);
-        loadProfile(userData);
-      };
-      reader.readAsDataURL(profilePic);
-    } else {
-      saveUserData();
-      showSection(profileSection);
-      loadProfile(userData);
-    }
-  });
-
-  document.getElementById("logout").addEventListener("click", () => {
-    userData.loggedIn = false;
-    localStorage.setItem("userData", JSON.stringify(userData));
-    showSection(loginSection);
-  });
-
-  function saveUserData() {
-    localStorage.setItem("userData", JSON.stringify(userData));
-  }
-
-  function loadProfile(data) {
-    document.getElementById("profileDp").style.backgroundImage = data.profilePic
-      ? `url(${data.profilePic})`
-      : "";
-    document.getElementById("profileName").textContent = data.fullName;
-    document.getElementById("profileEmail").textContent = data.email;
-    document.getElementById("profileMobile").textContent = data.mobile;
-  }
-});
+function selectDP(img) {
+    selectedDP = img.src;
+}
