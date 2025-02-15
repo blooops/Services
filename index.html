@@ -4,102 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background: #121212;
-            color: white;
-        }
-        .container {
-            width: 350px;
-            padding: 20px;
-            margin: 100px auto;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 5px;
-            border: none;
-            border-radius: 5px;
-            background: #222;
-            color: white;
-        }
-        button { background: #1db954; cursor: pointer; }
-        .dp-container img {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 3px solid #1db954; display: none;
-            margin-bottom: 10px;
-        }
-        .masked-info {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h2>Login</h2>
         <div class="dp-container">
             <img id="userDP" src="" alt="Profile DP">
-            <h3 id="userName" style="display:none;"></h3>
-            <p id="maskedPhone" class="masked-info" style="display:none;"></p>
+            <h3 id="userName"></h3>
+            <p id="maskedInfo"></p>
         </div>
-
         <input type="text" id="userInput" placeholder="Enter Email or Phone">
         <button id="nextBtn" onclick="checkUser()">Next</button>
-
-        <input type="password" id="password" placeholder="Enter Password" style="display:none;">
-        <button id="loginBtn" style="display:none;" onclick="login()">Login</button>
-
+        <input type="password" id="password" placeholder="Enter Password">
+        <button id="loginBtn" onclick="login()">Login</button>
         <p>New User? <a href="signup.html">Signup</a></p>
     </div>
-
-    <script>
-        let users = JSON.parse(localStorage.getItem("users")) || {};
-        let loggedInUser = localStorage.getItem("loggedInUser");
-
-        if (loggedInUser) {
-            window.location.href = "abc.xyz";  // Redirect if already logged in
-        }
-
-        function maskPhone(phone) {
-            return phone.replace(/(\d{2})\d{6}(\d{2})/, "+91$1******$2");
-        }
-
-        function checkUser() {
-            let input = document.getElementById("userInput").value;
-            if (users[input]) {
-                document.getElementById("userDP").src = users[input].dp;
-                document.getElementById("userDP").style.display = "block";
-                document.getElementById("userName").innerText = users[input].fullName;
-                document.getElementById("userName").style.display = "block";
-                document.getElementById("maskedPhone").innerText = maskPhone(input);
-                document.getElementById("maskedPhone").style.display = "block";
-                
-                document.getElementById("password").style.display = "block";
-                document.getElementById("loginBtn").style.display = "block";
-                document.getElementById("nextBtn").style.display = "none";
-                document.getElementById("userInput").readOnly = true;
-            } else {
-                alert("User not registered!");
-                window.location.href = "signup.html";
-            }
-        }
-
-        function login() {
-            let input = document.getElementById("userInput").value;
-            let password = document.getElementById("password").value;
-
-            if (users[input].password === password) {
-                localStorage.setItem("loggedInUser", input);
-                window.location.href = "abc.xyz";
-            } else {
-                alert("Incorrect password!");
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
