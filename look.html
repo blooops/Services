@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Site</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        iframe { width: 100%; height: 90vh; border: none; }
+    </style>
+</head>
+<body>
+    <h2>Embedded Site</h2>
+    <iframe id="siteFrame" src="https://coldhotstar.framer.ai/"></iframe>
+    <script>
+        let timeLimit = parseInt(localStorage.getItem('timeLimit')) || 0;
+        let timeUsed = parseInt(localStorage.getItem('timeUsed')) || 0;
+        let restrictionPassword = localStorage.getItem('restrictionPassword');
+
+        if (timeLimit > 0) {
+            let timer = setInterval(() => {
+                timeUsed++;
+                localStorage.setItem('timeUsed', timeUsed);
+                if (timeUsed >= timeLimit) {
+                    clearInterval(timer);
+                    document.getElementById('siteFrame').style.display = 'none';
+                    askForPassword();
+                }
+            }, 60000); // Increment time every minute
+        }
+
+        function askForPassword() {
+            let enteredPassword = prompt('Time limit reached! Enter password to continue:');
+            if (enteredPassword === restrictionPassword) {
+                localStorage.setItem('timeUsed', '0');
+                document.getElementById('siteFrame').style.display = 'block';
+            } else {
+                alert('Incorrect password!');
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
