@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embedded Site</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        iframe { width: 100%; height: 90vh; border: none; display: none; }
-        .block-message { display: none; font-size: 20px; color: red; margin-top: 20px; }
+        body { margin: 0; overflow: hidden; }
+        iframe { width: 100vw; height: 100vh; border: none; display: none; }
     </style>
 </head>
 <body>
-    <h2>Embedded Site</h2>
     <iframe id="siteFrame" src="https://coldhotstar.framer.ai/2-home"></iframe>
-    <p class="block-message" id="blockMessage">Time limit exceeded! Enter password to extend time.</p>
-    <button id="extendTimeBtn" style="display: none;" onclick="askForPassword()">Enter Password to Extend</button>
 
     <script>
         let timeLimit = parseInt(localStorage.getItem('timeLimit')) || 0;
@@ -22,8 +18,6 @@
         let restrictionPassword = localStorage.getItem('restrictionPassword');
         let lastVisit = parseInt(localStorage.getItem('lastVisit')) || Date.now();
         let siteFrame = document.getElementById('siteFrame');
-        let blockMessage = document.getElementById('blockMessage');
-        let extendTimeBtn = document.getElementById('extendTimeBtn');
 
         function updateTimeUsed() {
             let now = Date.now();
@@ -32,36 +26,31 @@
             localStorage.setItem('timeUsed', timeUsed);
             localStorage.setItem('lastVisit', now);
 
-            if (timeUsed >= timeLimit && timeLimit > 0) {
-                siteFrame.style.display = 'none';
-                blockMessage.style.display = 'block';
-                extendTimeBtn.style.display = 'block';
-            } else {
+            if (timeLimit === 0 || timeUsed < timeLimit) {
                 siteFrame.style.display = 'block';
                 let timer = setInterval(() => {
                     timeUsed++;
                     localStorage.setItem('timeUsed', timeUsed);
-                    if (timeUsed >= timeLimit) {
+                    if (timeUsed >= timeLimit && timeLimit > 0) {
                         clearInterval(timer);
-                        siteFrame.style.display = 'none';
-                        blockMessage.style.display = 'block';
-                        extendTimeBtn.style.display = 'block';
+                        requestPasswordToExtend();
                     }
-                }, 60000); // Increment time every minute
+                }, 60000); 
+            } else {
+                requestPasswordToExtend();
             }
         }
 
-        function askForPassword() {
-            let enteredPassword = prompt('Enter password to extend time:');
+        function requestPasswordToExtend() {
+            siteFrame.style.display = 'none';
+            let enteredPassword = prompt('Time limit reached! Enter password to extend:');
             if (enteredPassword === restrictionPassword) {
                 let extraTime = parseInt(prompt('How many extra minutes? (1, 5, 10, 30)'));
                 if ([1, 5, 10, 30].includes(extraTime)) {
                     timeLimit += extraTime;
                     localStorage.setItem('timeLimit', timeLimit);
-                    localStorage.setItem('timeUsed', '0'); // Reset time used
+                    localStorage.setItem('timeUsed', '0'); 
                     siteFrame.style.display = 'block';
-                    blockMessage.style.display = 'none';
-                    extendTimeBtn.style.display = 'none';
                 } else {
                     alert('Invalid time entered!');
                 }
