@@ -30,14 +30,28 @@
             border: 1px solid #555;
             outline: none;
         }
-        button {
+        .buttons {
             margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        button {
             padding: 10px 20px;
             font-size: 18px;
-            background-color: #6200ea;
-            color: white;
             border: none;
             cursor: pointer;
+        }
+        .save-btn {
+            background-color: #6200ea;
+            color: white;
+        }
+        .reset-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        .close-btn {
+            background-color: red;
+            color: white;
         }
     </style>
 </head>
@@ -52,7 +66,11 @@
     <input type="text" maxlength="1" oninput="moveNext(this, 4)">
     <input type="text" maxlength="1" oninput="moveNext(this, 5)">
 </div>
-<button onclick="setCode()">Save Code</button>
+<div class="buttons">
+    <button class="save-btn" onclick="setCode()">Save Code</button>
+    <button class="reset-btn" onclick="resetLock()">Reset Lock</button>
+    <button class="close-btn" onclick="closePage()">Close</button>
+</div>
 
 <script>
     function moveNext(input, index) {
@@ -72,6 +90,16 @@
         } else {
             alert("Please enter a full 6-digit code.");
         }
+    }
+
+    function resetLock() {
+        localStorage.removeItem("lockUntil");  // Unlock the system
+        localStorage.removeItem("attempts");   // Reset failed attempts
+        alert("Lock has been reset. Users can try again.");
+    }
+
+    function closePage() {
+        window.location.href = "https://abc.xyz";
     }
 </script>
 
