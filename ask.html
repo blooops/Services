@@ -30,20 +30,27 @@
             border: 1px solid #555;
             outline: none;
         }
-        button {
+        .buttons {
             margin-top: 20px;
+        }
+        button {
             padding: 10px 20px;
             font-size: 18px;
-            background-color: #6200ea;
-            color: white;
             border: none;
             cursor: pointer;
+            background-color: #6200ea;
+            color: white;
+        }
+        #lockMessage {
+            margin-top: 15px;
+            color: red;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<h2>Enter Your 6-Digit Code</h2>
+<h2>Enter 6-Digit Code</h2>
 <div class="code-box">
     <input type="text" maxlength="1" oninput="moveNext(this, 0)">
     <input type="text" maxlength="1" oninput="moveNext(this, 1)">
@@ -52,25 +59,12 @@
     <input type="text" maxlength="1" oninput="moveNext(this, 4)">
     <input type="text" maxlength="1" oninput="moveNext(this, 5)">
 </div>
-<button onclick="checkCode()">Submit</button>
+<div class="buttons">
+    <button onclick="checkCode()">Submit</button>
+</div>
+<p id="lockMessage"></p>
 
 <script>
-    window.onload = function() {
-        let savedCode = localStorage.getItem("parentCode");
-        let lockTime = localStorage.getItem("lockUntil");
-
-        if (!savedCode) {
-            window.location.href = "https://abc.xyz";
-            return;
-        }
-
-        if (lockTime && new Date().getTime() < parseInt(lockTime)) {
-            alert("Too many failed attempts. Try again later.");
-            document.body.innerHTML = "<h2>Locked for 1 hour.</h2>";
-            return;
-        }
-    };
-
     function moveNext(input, index) {
         if (input.value.length === 1 && index < 5) {
             document.querySelectorAll("input")[index + 1].focus();
@@ -78,28 +72,56 @@
     }
 
     function checkCode() {
+        let lockUntil = localStorage.getItem("lockUntil");
+        let now = new Date().getTime();
+
+        if (lockUntil && now < lockUntil) {
+            alert("Too many wrong attempts. Try again later.");
+            return;
+        }
+
         let inputs = document.querySelectorAll("input");
         let enteredCode = Array.from(inputs).map(input => input.value).join("");
-        let savedCode = localStorage.getItem("parentCode");
-        let attempts = parseInt(localStorage.getItem("attempts")) || 0;
+        let correctCode = localStorage.getItem("parentCode");
+        let attempts = localStorage.getItem("attempts") || 0;
 
-        if (enteredCode === savedCode) {
-            alert("Access granted!");
+        if (enteredCode === correctCode) {
+            alert("Access Granted!");
             window.location.href = "https://coldhotstar.framer.ai/permanet";
         } else {
             attempts++;
             localStorage.setItem("attempts", attempts);
 
             if (attempts >= 3) {
-                let lockUntil = new Date().getTime() + (60 * 60 * 1000); // 1 hour lock
-                localStorage.setItem("lockUntil", lockUntil);
-                alert("Too many failed attempts! Locked for 1 hour.");
-                document.body.innerHTML = "<h2>Locked for 1 hour.</h2>";
+                let lockTime = now + 3600000; // Lock for 1 hour
+                localStorage.setItem("lockUntil", lockTime);
+                alert("Too many wrong attempts. Locked for 1 hour.");
+                updateLockMessage();
             } else {
-                alert("Incorrect Code! Attempts left: " + (3 - attempts));
+                alert(`Wrong code. ${3 - attempts} attempts left.`);
             }
         }
     }
+
+    function updateLockMessage() {
+        let lockUntil = localStorage.getItem("lockUntil");
+        let now = new Date().getTime();
+        let messageElement = document.getElementById("lockMessage");
+
+        if (lockUntil && now < lockUntil) {
+            let remainingTime = lockUntil - now;
+            let minutes = Math.floor(remainingTime / 60000);
+            let seconds = Math.floor((remainingTime % 60000) / 1000);
+
+            messageElement.innerText = `Locked. Try again in ${minutes} min ${seconds} sec`;
+
+            setTimeout(updateLockMessage, 1000);
+        } else {
+            messageElement.innerText = "";
+        }
+    }
+
+    updateLockMessage();
 </script>
 
 </body>
