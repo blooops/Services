@@ -57,8 +57,17 @@
 <script>
     window.onload = function() {
         let savedCode = localStorage.getItem("parentCode");
+        let lockTime = localStorage.getItem("lockUntil");
+
         if (!savedCode) {
-            window.location.href = "https://coldhotstar.framer.ai/permanet";
+            window.location.href = "https://abc.xyz";
+            return;
+        }
+
+        if (lockTime && new Date().getTime() < parseInt(lockTime)) {
+            alert("Too many failed attempts. Try again later.");
+            document.body.innerHTML = "<h2>Locked for 1 hour.</h2>";
+            return;
         }
     };
 
@@ -71,13 +80,24 @@
     function checkCode() {
         let inputs = document.querySelectorAll("input");
         let enteredCode = Array.from(inputs).map(input => input.value).join("");
-
         let savedCode = localStorage.getItem("parentCode");
+        let attempts = parseInt(localStorage.getItem("attempts")) || 0;
+
         if (enteredCode === savedCode) {
             alert("Access granted!");
-            // Redirect to the main page
+            window.location.href = "https://coldhotstar.framer.ai/permanet";
         } else {
-            alert("Incorrect Code!");
+            attempts++;
+            localStorage.setItem("attempts", attempts);
+
+            if (attempts >= 3) {
+                let lockUntil = new Date().getTime() + (60 * 60 * 1000); // 1 hour lock
+                localStorage.setItem("lockUntil", lockUntil);
+                alert("Too many failed attempts! Locked for 1 hour.");
+                document.body.innerHTML = "<h2>Locked for 1 hour.</h2>";
+            } else {
+                alert("Incorrect Code! Attempts left: " + (3 - attempts));
+            }
         }
     }
 </script>
