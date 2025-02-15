@@ -1,14 +1,146 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SmartAIBot - Upload Image | Generate Image | Chat</title>
-    <script type="module" crossorigin src="./geo.js"></script>
-    <link rel="stylesheet" crossorigin href="./geo.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #121212;
+            color: white;
+        }
+        .container {
+            width: 350px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+        }
+        button { background: #1db954; cursor: pointer; }
+        .hidden { display: none; }
+        .dp-container {
+            margin: 10px 0;
+        }
+        .dp-container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .dp-options img {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid transparent;
+        }
+        .dp-options img.selected { border: 2px solid #1db954; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="title">Login / Signup</h2>
+
+        <div id="dpNameSection" class="hidden">
+            <div class="dp-container">
+                <img id="displayDP" src="" alt="Profile Picture">
+            </div>
+            <h3 id="displayName"></h3>
+        </div>
+
+        <input type="text" id="identifier" placeholder="Email or Phone Number">
+        <button id="nextBtn" onclick="checkUser()">Next</button>
+
+        <div id="passwordSection" class="hidden">
+            <input type="password" id="password" placeholder="Enter Password">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="signupSection" class="hidden">
+            <input type="text" id="fullName" placeholder="Full Name">
+            <input type="password" id="newPassword" placeholder="Set Password">
+            <h4>Select Profile Picture:</h4>
+            <div class="dp-options">
+                <img src="dp1.png" onclick="selectDP('dp1.png')" id="dp1">
+                <img src="dp2.png" onclick="selectDP('dp2.png')" id="dp2">
+                <img src="dp3.png" onclick="selectDP('dp3.png')" id="dp3">
+            </div>
+            <button onclick="signup()">Sign Up</button>
+        </div>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem("users")) || {};
+        let loggedInUser = localStorage.getItem("loggedInUser");
+        let selectedDP = "";
+
+        if (loggedInUser) {
+            window.location.href = "https://abc.xyz";
+        }
+
+        function checkUser() {
+            let identifier = document.getElementById("identifier").value;
+            if (users[identifier]) {
+                document.getElementById("passwordSection").classList.remove("hidden");
+                document.getElementById("signupSection").classList.add("hidden");
+                document.getElementById("nextBtn").classList.add("hidden");
+
+                // Show DP and Name
+                document.getElementById("dpNameSection").classList.remove("hidden");
+                document.getElementById("displayDP").src = users[identifier].dp;
+                document.getElementById("displayName").innerText = users[identifier].fullName;
+            } else {
+                document.getElementById("signupSection").classList.remove("hidden");
+                document.getElementById("passwordSection").classList.add("hidden");
+                document.getElementById("dpNameSection").classList.add("hidden");
+            }
+        }
+
+        function selectDP(dp) {
+            selectedDP = dp;
+            document.querySelectorAll(".dp-options img").forEach(img => img.classList.remove("selected"));
+            document.getElementById(dp.replace(".png", "")).classList.add("selected");
+        }
+
+        function login() {
+            let identifier = document.getElementById("identifier").value;
+            let password = document.getElementById("password").value;
+            if (users[identifier] && users[identifier].password === password) {
+                localStorage.setItem("loggedInUser", identifier);
+                window.location.href = "https://abc.xyz";
+            } else {
+                alert("Invalid credentials");
+            }
+        }
+
+        function signup() {
+            let identifier = document.getElementById("identifier").value;
+            let fullName = document.getElementById("fullName").value;
+            let password = document.getElementById("newPassword").value;
+            if (!selectedDP) {
+                alert("Please select a profile picture.");
+                return;
+            }
+            users[identifier] = { fullName, password, dp: selectedDP };
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("loggedInUser", identifier);
+            window.location.href = "https://abc.xyz";
+        }
+    </script>
+</body>
 </html>

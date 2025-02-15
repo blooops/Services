@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #121212;
+            color: white;
+        }
+        .container {
+            width: 350px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: #222;
+            color: white;
+        }
+        button { background: #1db954; cursor: pointer; }
+        .dp-container {
+            margin: 10px 0;
+        }
+        .dp-container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        .dp-options img {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid transparent;
+        }
+        .dp-options img.selected { border: 2px solid #1db954; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Profile</h2>
+
+        <div class="dp-container">
+            <img id="currentDP" src="" alt="Profile Picture">
+        </div>
+
+        <input type="text" id="fullName" placeholder="Full Name">
+        <input type="password" id="password" placeholder="New Password">
+        
+        <h4>Select New Profile Picture:</h4>
+        <div class="dp-options">
+            <img src="dp1.png" onclick="selectDP('dp1.png')" id="dp1">
+            <img src="dp2.png" onclick="selectDP('dp2.png')" id="dp2">
+            <img src="dp3.png" onclick="selectDP('dp3.png')" id="dp3">
+        </div>
+
+        <button onclick="updateProfile()">Save Changes</button>
+        <button onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        let users = JSON.parse(localStorage.getItem("users")) || {};
+        let loggedInUser = localStorage.getItem("loggedInUser");
+        let selectedDP = "";
+
+        if (!loggedInUser) {
+            window.location.href = "index.html";
+        } else {
+            let userData = users[loggedInUser];
+            document.getElementById("fullName").value = userData.fullName;
+            document.getElementById("currentDP").src = userData.dp;
+            selectedDP = userData.dp;
+        }
+
+        function selectDP(dp) {
+            selectedDP = dp;
+            document.querySelectorAll(".dp-options img").forEach(img => img.classList.remove("selected"));
+            document.getElementById(dp.replace(".png", "")).classList.add("selected");
+        }
+
+        function updateProfile() {
+            let newFullName = document.getElementById("fullName").value;
+            let newPassword = document.getElementById("password").value;
+
+            if (newFullName) users[loggedInUser].fullName = newFullName;
+            if (newPassword) users[loggedInUser].password = newPassword;
+            if (selectedDP) users[loggedInUser].dp = selectedDP;
+
+            localStorage.setItem("users", JSON.stringify(users));
+            alert("Profile updated successfully!");
+        }
+
+        function goBack() {
+            window.location.href = "profile.html";
+        }
+    </script>
+</body>
+</html>
+
