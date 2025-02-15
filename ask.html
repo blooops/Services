@@ -121,7 +121,18 @@
         }
     }
 
-    updateLockMessage();
+    function checkFirstTime() {
+        let parentCode = localStorage.getItem("parentCode");
+        let lockUntil = localStorage.getItem("lockUntil");
+
+        if (!parentCode) {
+            window.location.href = "set.html"; // Redirect if no code is set
+        } else if (lockUntil && new Date().getTime() < lockUntil) {
+            updateLockMessage(); // Show remaining time if locked
+        }
+    }
+
+    checkFirstTime();
 </script>
 
 </body>
