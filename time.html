@@ -13,7 +13,7 @@
     <div class="container">
         <h2>Set Daily Time Limit</h2>
         <select id="timeLimit">
-            <option value="0">Off</option>
+            <option value="0">No Limit</option>
             <option value="1">1 Min</option>
             <option value="10">10 Min</option>
             <option value="30">30 Min</option>
@@ -29,14 +29,17 @@
         function saveSettings() {
             let timeLimit = document.getElementById('timeLimit').value;
             let password = document.getElementById('password').value;
+
             if (password.trim() === '') {
                 alert('Please set a password');
                 return;
             }
+
             localStorage.setItem('timeLimit', timeLimit);
             localStorage.setItem('restrictionPassword', password);
             localStorage.setItem('timeUsed', '0');
             localStorage.setItem('lastVisit', Date.now());
+
             alert('Settings saved!');
         }
     </script>
