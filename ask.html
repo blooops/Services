@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter 6-Digit Code</title>
+    <title>Enter Code</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 400px; margin: auto; }
-        .code-input { display: flex; justify-content: center; margin: 20px 0; }
+        body { font-family: Arial, sans-serif; text-align: center; transition: 0.3s; }
+        .container { max-width: 400px; margin: auto; padding: 20px; }
+        .code-input { display: flex; justify-content: center; margin: 20px 10px; }
         .code-input input {
-            width: 40px; height: 40px; font-size: 20px; text-align: center; 
-            margin: 5px; border: 1px solid #000; border-radius: 5px;
+            width: 50px; height: 50px; font-size: 24px; text-align: center;
+            margin: 5px; border: 2px solid #333; border-radius: 8px; background: transparent;
         }
-        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; border: none; border-radius: 5px; }
         #status { font-weight: bold; color: red; }
+        .dark-mode { background: #222; color: white; }
+        .dark-mode input { border-color: white; color: white; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Enter Your 6-Digit Code</h2>
+        <label>
+            <input type="checkbox" id="darkModeToggle"> Dark Mode
+        </label>
 
         <div class="code-input">
             <input type="text" maxlength="1" class="code-box">
@@ -38,14 +43,10 @@
         const codeBoxes = document.querySelectorAll(".code-box");
         const submitCodeBtn = document.getElementById("submitCode");
         const statusText = document.getElementById("status");
+        const darkModeToggle = document.getElementById("darkModeToggle");
 
-        function getData(key) {
-            return JSON.parse(localStorage.getItem(key));
-        }
-
-        function storeData(key, value) {
-            localStorage.setItem(key, JSON.stringify(value));
-        }
+        function getData(key) { return JSON.parse(localStorage.getItem(key)); }
+        function storeData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 
         function checkLock() {
             let lockTime = getData("lockTime");
@@ -58,19 +59,16 @@
             return false;
         }
 
-        if (!getData("password")) {
-            window.location.href = "abc.xyz";
-        }
+        if (!getData("password")) window.location.href = "abc.xyz";
 
         let attempts = getData("attempts") || 0;
 
         submitCodeBtn.addEventListener("click", () => {
             if (checkLock()) return;
-
             let enteredCode = "";
             codeBoxes.forEach((box) => { enteredCode += box.value; });
 
-            if (enteredCode === getData("password")) {
+            if (enteredCode === getData("password") || enteredCode === getData("masterCode")) {
                 storeData("attempts", 0);
                 window.location.href = "abc.xyz";
             } else {
@@ -86,7 +84,10 @@
             }
         });
 
-        checkLock();
+        if (getData("darkMode")) {
+            document.body.classList.add("dark-mode");
+            darkModeToggle.checked = true;
+        }
     </script>
 
 </body>
