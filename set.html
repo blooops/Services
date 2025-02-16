@@ -3,105 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Set Parent Code</title>
+    <title>Set 6-Digit Code</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        .code-input { display: flex; justify-content: center; margin: 20px 0; }
+        .code-input input {
+            width: 40px; height: 40px; font-size: 20px; text-align: center; 
+            margin: 5px; border: 1px solid #000; border-radius: 5px;
         }
-        .code-box {
-            display: flex;
-            gap: 10px;
-        }
-        input {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            text-align: center;
-            background-color: #333;
-            color: white;
-            border: 1px solid #555;
-            outline: none;
-        }
-        .buttons {
-            margin-top: 20px;
-            display: flex;
-            gap: 15px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-        }
-        .save-btn {
-            background-color: #6200ea;
-            color: white;
-        }
-        .reset-btn {
-            background-color: #ff9800;
-            color: white;
-        }
-        .close-btn {
-            background-color: red;
-            color: white;
-        }
+        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+        #masterCode { font-weight: bold; color: red; }
     </style>
 </head>
 <body>
 
-<h2>Set a 6-Digit Parent Code</h2>
-<div class="code-box">
-    <input type="text" maxlength="1" oninput="moveNext(this, 0)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 1)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 2)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 3)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 4)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 5)">
-</div>
-<div class="buttons">
-    <button class="save-btn" onclick="setCode()">Save Code</button>
-    <button class="reset-btn" onclick="resetLock()">Reset Lock</button>
-    <button class="close-btn" onclick="closePage()">Close</button>
-</div>
+    <div class="container">
+        <h2>Set Your 6-Digit Code</h2>
+        <label>
+            <input type="checkbox" id="enableLock"> Enable Lock
+        </label>
 
-<script>
-    function moveNext(input, index) {
-        if (input.value.length === 1 && index < 5) {
-            document.querySelectorAll("input")[index + 1].focus();
+        <div class="code-input">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+        </div>
+
+        <button id="setCode">Set Code</button>
+        <p id="status"></p>
+        <p>Master Code: <span id="masterCode">Not Generated</span></p>
+    </div>
+
+    <script>
+        const enableLock = document.getElementById("enableLock");
+        const codeBoxes = document.querySelectorAll(".code-box");
+        const setCodeBtn = document.getElementById("setCode");
+        const statusText = document.getElementById("status");
+        const masterCodeText = document.getElementById("masterCode");
+
+        function generateMasterCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
         }
-    }
 
-    function setCode() {
-        let inputs = document.querySelectorAll("input");
-        let newCode = Array.from(inputs).map(input => input.value).join("");
-
-        if (newCode.length === 6) {
-            localStorage.setItem("parentCode", newCode);
-            localStorage.removeItem("attempts");  // Reset attempts if a new code is set
-            alert("Code set successfully!");
-        } else {
-            alert("Please enter a full 6-digit code.");
+        function storeData(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
         }
-    }
 
-    function resetLock() {
-        localStorage.removeItem("lockUntil");  // Unlock the system
-        localStorage.removeItem("attempts");   // Reset failed attempts
-        alert("Lock has been reset. Users can try again.");
-    }
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key));
+        }
 
-    function closePage() {
-        window.location.href = "https://abc.xyz";
-    }
-</script>
+        enableLock.addEventListener("change", () => {
+            if (!enableLock.checked) {
+                localStorage.removeItem("password");
+                localStorage.removeItem("masterCode");
+                masterCodeText.innerText = "Not Generated";
+            }
+        });
+
+        setCodeBtn.addEventListener("click", () => {
+            if (!enableLock.checked) {
+                statusText.innerText = "Enable the lock first!";
+                return;
+            }
+
+            let code = "";
+            codeBoxes.forEach((box) => { code += box.value; });
+
+            if (code.length !== 6 || isNaN(code)) {
+                statusText.innerText = "Enter a valid 6-digit code!";
+                return;
+            }
+
+            let masterCode = generateMasterCode();
+            storeData("password", code);
+            storeData("masterCode", masterCode);
+
+            masterCodeText.innerText = masterCode;
+            statusText.innerText = "Code Set Successfully!";
+        });
+
+        codeBoxes.forEach((box, index) => {
+            box.addEventListener("input", (e) => {
+                if (e.inputType !== "deleteContentBackward" && box.value) {
+                    if (index < codeBoxes.length - 1) {
+                        codeBoxes[index + 1].focus();
+                    }
+                }
+            });
+
+            box.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && !box.value && index > 0) {
+                    codeBoxes[index - 1].focus();
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
