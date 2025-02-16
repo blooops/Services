@@ -3,137 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter Code</title>
+    <title>Enter 6-Digit Code</title>
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; }
+        .code-input { display: flex; justify-content: center; margin: 20px 0; }
+        .code-input input {
+            width: 40px; height: 40px; font-size: 20px; text-align: center; 
+            margin: 5px; border: 1px solid #000; border-radius: 5px;
         }
-        .code-box {
-            display: flex;
-            gap: 10px;
-        }
-        input {
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            text-align: center;
-            background-color: #333;
-            color: white;
-            border: 1px solid #555;
-            outline: none;
-        }
-        .buttons {
-            margin-top: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            border: none;
-            cursor: pointer;
-            background-color: #6200ea;
-            color: white;
-        }
-        #lockMessage {
-            margin-top: 15px;
-            color: red;
-            font-size: 18px;
-        }
+        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+        #status { font-weight: bold; color: red; }
     </style>
 </head>
 <body>
 
-<h2>Enter 6-Digit Code</h2>
-<div class="code-box">
-    <input type="text" maxlength="1" oninput="moveNext(this, 0)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 1)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 2)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 3)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 4)">
-    <input type="text" maxlength="1" oninput="moveNext(this, 5)">
-</div>
-<div class="buttons">
-    <button onclick="checkCode()">Submit</button>
-</div>
-<p id="lockMessage"></p>
+    <div class="container">
+        <h2>Enter Your 6-Digit Code</h2>
 
-<script>
-    function moveNext(input, index) {
-        if (input.value.length === 1 && index < 5) {
-            document.querySelectorAll("input")[index + 1].focus();
-        }
-    }
+        <div class="code-input">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+            <input type="text" maxlength="1" class="code-box">
+        </div>
 
-    function checkCode() {
-        let lockUntil = localStorage.getItem("lockUntil");
-        let now = new Date().getTime();
+        <button id="submitCode">Submit</button>
+        <p id="status"></p>
+    </div>
 
-        if (lockUntil && now < lockUntil) {
-            alert("Too many wrong attempts. Try again later.");
-            return;
+    <script>
+        const codeBoxes = document.querySelectorAll(".code-box");
+        const submitCodeBtn = document.getElementById("submitCode");
+        const statusText = document.getElementById("status");
+
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key));
         }
 
-        let inputs = document.querySelectorAll("input");
-        let enteredCode = Array.from(inputs).map(input => input.value).join("");
-        let correctCode = localStorage.getItem("parentCode");
-        let attempts = localStorage.getItem("attempts") || 0;
+        function storeData(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
 
-        if (enteredCode === correctCode) {
-            alert("Access Granted!");
-            window.location.href = "https://coldhotstar.framer.ai/permanet";
-        } else {
-            attempts++;
-            localStorage.setItem("attempts", attempts);
-
-            if (attempts >= 3) {
-                let lockTime = now + 3600000; // Lock for 1 hour
-                localStorage.setItem("lockUntil", lockTime);
-                alert("Too many wrong attempts. Locked for 1 hour.");
-                updateLockMessage();
-            } else {
-                alert(`Wrong code. ${3 - attempts} attempts left.`);
+        function checkLock() {
+            let lockTime = getData("lockTime");
+            if (lockTime && new Date().getTime() < lockTime) {
+                let remaining = Math.ceil((lockTime - new Date().getTime()) / 60000);
+                statusText.innerText = `Locked! Try again in ${remaining} minutes.`;
+                submitCodeBtn.disabled = true;
+                return true;
             }
+            return false;
         }
-    }
 
-    function updateLockMessage() {
-        let lockUntil = localStorage.getItem("lockUntil");
-        let now = new Date().getTime();
-        let messageElement = document.getElementById("lockMessage");
-
-        if (lockUntil && now < lockUntil) {
-            let remainingTime = lockUntil - now;
-            let minutes = Math.floor(remainingTime / 60000);
-            let seconds = Math.floor((remainingTime % 60000) / 1000);
-
-            messageElement.innerText = `Locked. Try again in ${minutes} min ${seconds} sec`;
-
-            setTimeout(updateLockMessage, 1000);
-        } else {
-            messageElement.innerText = "";
+        if (!getData("password")) {
+            window.location.href = "abc.xyz";
         }
-    }
 
-    function checkFirstTime() {
-        let parentCode = localStorage.getItem("parentCode");
-        let lockUntil = localStorage.getItem("lockUntil");
+        let attempts = getData("attempts") || 0;
 
-        if (!parentCode) {
-            window.location.href = "set.html"; // Redirect if no code is set
-        } else if (lockUntil && new Date().getTime() < lockUntil) {
-            updateLockMessage(); // Show remaining time if locked
-        }
-    }
+        submitCodeBtn.addEventListener("click", () => {
+            if (checkLock()) return;
 
-    checkFirstTime();
-</script>
+            let enteredCode = "";
+            codeBoxes.forEach((box) => { enteredCode += box.value; });
+
+            if (enteredCode === getData("password")) {
+                storeData("attempts", 0);
+                window.location.href = "abc.xyz";
+            } else {
+                attempts++;
+                storeData("attempts", attempts);
+                if (attempts >= 5) {
+                    storeData("lockTime", new Date().getTime() + 3600000);
+                    statusText.innerText = "Locked for 1 hour!";
+                    submitCodeBtn.disabled = true;
+                } else {
+                    statusText.innerText = `Wrong! ${5 - attempts} tries left.`;
+                }
+            }
+        });
+
+        checkLock();
+    </script>
 
 </body>
 </html>
