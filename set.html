@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Set 6-Digit Code</title>
+    <title>Set Code</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 400px; margin: auto; }
-        .code-input { display: flex; justify-content: center; margin: 20px 0; }
+        body { font-family: Arial, sans-serif; text-align: center; transition: 0.3s; }
+        .container { max-width: 400px; margin: auto; padding: 20px; }
+        .code-input { display: flex; justify-content: center; margin: 20px 10px; }
         .code-input input {
-            width: 40px; height: 40px; font-size: 20px; text-align: center; 
-            margin: 5px; border: 1px solid #000; border-radius: 5px;
+            width: 50px; height: 50px; font-size: 24px; text-align: center;
+            margin: 5px; border: 2px solid #333; border-radius: 8px; background: transparent;
         }
-        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; border: none; border-radius: 5px; }
         #masterCode { font-weight: bold; color: red; }
+        .dark-mode { background: #222; color: white; }
+        .dark-mode input { border-color: white; color: white; }
     </style>
 </head>
 <body>
@@ -22,6 +24,10 @@
         <h2>Set Your 6-Digit Code</h2>
         <label>
             <input type="checkbox" id="enableLock"> Enable Lock
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" id="darkModeToggle"> Dark Mode
         </label>
 
         <div class="code-input">
@@ -44,10 +50,7 @@
         const setCodeBtn = document.getElementById("setCode");
         const statusText = document.getElementById("status");
         const masterCodeText = document.getElementById("masterCode");
-
-        function generateMasterCode() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
+        const darkModeToggle = document.getElementById("darkModeToggle");
 
         function storeData(key, value) {
             localStorage.setItem(key, JSON.stringify(value));
@@ -57,12 +60,12 @@
             return JSON.parse(localStorage.getItem(key));
         }
 
+        function generateMasterCode() {
+            return getData("masterCode") || Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
         enableLock.addEventListener("change", () => {
-            if (!enableLock.checked) {
-                localStorage.removeItem("password");
-                localStorage.removeItem("masterCode");
-                masterCodeText.innerText = "Not Generated";
-            }
+            storeData("lockEnabled", enableLock.checked);
         });
 
         setCodeBtn.addEventListener("click", () => {
@@ -82,26 +85,28 @@
             let masterCode = generateMasterCode();
             storeData("password", code);
             storeData("masterCode", masterCode);
-
             masterCodeText.innerText = masterCode;
             statusText.innerText = "Code Set Successfully!";
         });
 
-        codeBoxes.forEach((box, index) => {
-            box.addEventListener("input", (e) => {
-                if (e.inputType !== "deleteContentBackward" && box.value) {
-                    if (index < codeBoxes.length - 1) {
-                        codeBoxes[index + 1].focus();
-                    }
-                }
-            });
-
-            box.addEventListener("keydown", (e) => {
-                if (e.key === "Backspace" && !box.value && index > 0) {
-                    codeBoxes[index - 1].focus();
-                }
-            });
+        darkModeToggle.addEventListener("change", () => {
+            document.body.classList.toggle("dark-mode");
+            storeData("darkMode", darkModeToggle.checked);
         });
+
+        // Load saved settings
+        if (getData("darkMode")) {
+            document.body.classList.add("dark-mode");
+            darkModeToggle.checked = true;
+        }
+
+        if (getData("lockEnabled")) {
+            enableLock.checked = true;
+        }
+
+        if (getData("masterCode")) {
+            masterCodeText.innerText = getData("masterCode");
+        }
     </script>
 
 </body>
