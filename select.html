@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+        }
+        .banner {
+            width: 100%;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            position: relative;
+        }
+        .logo {
+            max-width: 200px;
+            margin: 20px auto;
+            display: block;
+        }
+        .title {
+            font-size: 24px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .description {
+            font-size: 14px;
+            opacity: 0.8;
+            padding: 0 20px;
+        }
+        .button {
+            display: block;
+            background: white;
+            color: black;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px auto;
+            width: 90%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .fav-btn {
+            display: block;
+            background: red;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 90%;
+            margin: 10px auto;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="banner" class="banner"></div>
+        <img id="logo" class="logo" src="" alt="Movie Logo">
+        <h1 id="title" class="title">Loading...</h1>
+        <p id="details" class="details">2024 • A • 2 Seasons • 7 Languages</p>
+        <p id="description" class="description"></p>
+
+        <a id="watch-button" class="button">🔴 Subscribe to Watch</a>
+        <button id="fav-btn" class="fav-btn">❤️ Add to Favorites</button>
+    </div>
+
+    <script>
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const img = params.get("img");
+            const redirectUrl = params.get("redirecturl");
+            const logoUrl = params.get("logo");
+            const title = params.get("title") || "Unknown Title";
+            const details = params.get("details") || "No details available.";
+            const description = params.get("description") || "No description provided.";
+
+            if (img) document.getElementById("banner").style.backgroundImage = `url(${img})`;
+            if (redirectUrl) document.getElementById("watch-button").href = redirectUrl;
+            if (logoUrl) document.getElementById("logo").src = logoUrl;
+            document.getElementById("title").textContent = title;
+            document.getElementById("details").textContent = details;
+            document.getElementById("description").textContent = description;
+        }
+
+        getQueryParams();
+
+        document.getElementById("fav-btn").addEventListener("click", function() {
+            const params = new URLSearchParams(window.location.search);
+            const img = params.get("img");
+            const redirectUrl = params.get("redirecturl");
+            const logoUrl = params.get("logo");
+            const title = params.get("title") || "Unknown Title";
+            const details = params.get("details") || "No details available.";
+            const description = params.get("description") || "No description provided.";
+
+            const favs = JSON.parse(localStorage.getItem("favorites")) || [];
+            favs.push({ img, redirectUrl, logoUrl, title, details, description });
+            localStorage.setItem("favorites", JSON.stringify(favs));
+
+            alert("Added to Favorites!");
+        });
+    </script>
+
+</body>
+</html>
