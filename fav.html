@@ -6,112 +6,64 @@
     <title>Favorites</title>
     <style>
         body {
-            background: #000;
-            color: white;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 500px;
-            margin: auto;
-            background: #111;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .fav-item {
-            display: flex;
-            align-items: center;
-            background: #222;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .fav-item img {
-            width: 60px;
-            height: 60px;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-        .fav-content {
-            flex: 1;
-        }
-        .fav-title {
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .fav-details {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        .fav-description {
-            font-size: 12px;
-            opacity: 0.6;
-        }
-        .fav-actions {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        .fav-btn, .remove-btn {
-            background: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-            margin-top: 5px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .remove-btn {
-            background: red;
+            background: #121212;
             color: white;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .carousel {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px;
+            gap: 10px;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+        }
+        .movie-card {
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+            background: #222;
+            padding: 10px;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+        .carousel-img {
+            width: 100%;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h2>Your Favorites</h2>
-        <div id="favorites-list"></div>
-    </div>
+    <h1>My Favorites</h1>
+    <div class="carousel" id="fav-container"></div>
 
     <script>
-        function loadFavorites() {
-            const favs = JSON.parse(localStorage.getItem("favorites")) || [];
-            const favList = document.getElementById("favorites-list");
-            favList.innerHTML = "";
+        const favContainer = document.getElementById("fav-container");
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
 
-            favs.forEach((fav, index) => {
-                const item = document.createElement("div");
-                item.classList.add("fav-item");
-
-                item.innerHTML = `
-                    <img src="${fav.logoUrl}" alt="Logo">
-                    <div class="fav-content">
-                        <div class="fav-title">${fav.title}</div>
-                        <div class="fav-details">${fav.details}</div>
-                        <div class="fav-description">${fav.description}</div>
-                    </div>
-                    <div class="fav-actions">
-                        <a href="${fav.redirectUrl}" class="fav-btn" target="_blank">Watch ${fav.title}</a>
-                        <button class="remove-btn" onclick="removeFavorite(${index})">X</button>
-                    </div>
+        if (favorites.length === 0) {
+            favContainer.innerHTML = "<p>No favorites added yet.</p>";
+        } else {
+            favorites.forEach(movie => {
+                const movieCard = document.createElement("div");
+                movieCard.classList.add("movie-card");
+                movieCard.innerHTML = `
+                    <img src="${movie.img}" class="carousel-img">
+                    <h3>${movie.title}</h3>
                 `;
-
-                favList.appendChild(item);
+                movieCard.addEventListener("click", () => {
+                    window.location.href = movie.redirect;
+                });
+                favContainer.appendChild(movieCard);
             });
         }
-
-        function removeFavorite(index) {
-            let favs = JSON.parse(localStorage.getItem("favorites")) || [];
-            favs.splice(index, 1);
-            localStorage.setItem("favorites", JSON.stringify(favs));
-            loadFavorites();
-        }
-
-        loadFavorites();
     </script>
-
 </body>
 </html>
