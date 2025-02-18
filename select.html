@@ -6,117 +6,101 @@
     <title>Movie Details</title>
     <style>
         body {
-            background-color: black;
-            color: white;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            background: #121212;
+            color: white;
             text-align: center;
         }
-        .container {
-            max-width: 500px;
+        .movie-container {
+            width: 90%;
+            max-width: 600px;
             margin: auto;
+            background: #222;
             padding: 20px;
-        }
-        .banner {
-            width: 100%;
-            height: 300px;
-            background-size: cover;
-            background-position: center;
             border-radius: 10px;
-            position: relative;
         }
-        .logo {
-            max-width: 200px;
-            margin: 20px auto;
+        .movie-banner {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .movie-details {
+            margin-top: 20px;
+        }
+        button {
             display: block;
-        }
-        .title {
-            font-size: 24px;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .description {
-            font-size: 14px;
-            opacity: 0.8;
-            padding: 0 20px;
-        }
-        .button {
-            display: block;
-            background: white;
-            color: black;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 5px;
-            margin: 10px auto;
-            width: 90%;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .fav-btn {
-            display: block;
-            background: red;
-            color: white;
+            width: 100%;
             padding: 10px;
+            margin-top: 10px;
             border: none;
-            cursor: pointer;
-            width: 90%;
-            margin: 10px auto;
-            font-size: 16px;
-            font-weight: bold;
             border-radius: 5px;
+            background: #ff4500;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #777;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div id="banner" class="banner"></div>
-        <img id="logo" class="logo" src="" alt="Movie Logo">
-        <h1 id="title" class="title">Loading...</h1>
-        <p id="details" class="details">2024 • A • 2 Seasons • 7 Languages</p>
-        <p id="description" class="description"></p>
-
-        <a id="watch-button" class="button">🔴 Subscribe to Watch</a>
-        <button id="fav-btn" class="fav-btn">❤️ Add to Favorites</button>
+    <div class="movie-container">
+        <img id="movie-img" class="movie-banner" alt="Movie Image">
+        <div class="movie-details">
+            <h1 id="movie-title"></h1>
+            <p id="movie-year"></p>
+            <p id="movie-seasons"></p>
+            <p id="movie-languages"></p>
+            <p id="movie-genre"></p>
+            <p id="movie-description"></p>
+            <button id="watch-btn">Subscribe to Watch</button>
+            <button id="fav-btn">Add to Favorites</button>
+        </div>
     </div>
 
     <script>
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            const img = params.get("img");
-            const redirectUrl = params.get("redirecturl");
-            const logoUrl = params.get("logo");
-            const title = params.get("title") || "Unknown Title";
-            const details = params.get("details") || "No details available.";
-            const description = params.get("description") || "No description provided.";
+        // Parse URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const movie = {
+            img: params.get("img"),
+            title: params.get("title"),
+            year: params.get("year"),
+            seasons: params.get("seasons"),
+            languages: params.get("languages"),
+            genre: params.get("genre"),
+            description: params.get("description"),
+            redirect: params.get("redirect"),
+        };
 
-            if (img) document.getElementById("banner").style.backgroundImage = `url(${img})`;
-            if (redirectUrl) document.getElementById("watch-button").href = redirectUrl;
-            if (logoUrl) document.getElementById("logo").src = logoUrl;
-            document.getElementById("title").textContent = title;
-            document.getElementById("details").textContent = details;
-            document.getElementById("description").textContent = description;
-        }
+        document.getElementById("movie-img").src = movie.img;
+        document.getElementById("movie-title").innerText = movie.title;
+        document.getElementById("movie-year").innerText = "Year: " + movie.year;
+        document.getElementById("movie-seasons").innerText = "Seasons: " + movie.seasons;
+        document.getElementById("movie-languages").innerText = "Languages: " + movie.languages;
+        document.getElementById("movie-genre").innerText = "Genre: " + movie.genre;
+        document.getElementById("movie-description").innerText = movie.description;
 
-        getQueryParams();
-
-        document.getElementById("fav-btn").addEventListener("click", function() {
-            const params = new URLSearchParams(window.location.search);
-            const img = params.get("img");
-            const redirectUrl = params.get("redirecturl");
-            const logoUrl = params.get("logo");
-            const title = params.get("title") || "Unknown Title";
-            const details = params.get("details") || "No details available.";
-            const description = params.get("description") || "No description provided.";
-
-            const favs = JSON.parse(localStorage.getItem("favorites")) || [];
-            favs.push({ img, redirectUrl, logoUrl, title, details, description });
-            localStorage.setItem("favorites", JSON.stringify(favs));
-
-            alert("Added to Favorites!");
+        // Watch Button Redirect
+        document.getElementById("watch-btn").addEventListener("click", () => {
+            window.location.href = movie.redirect;
         });
-    </script>
 
+        // Favorites Logic
+        const favBtn = document.getElementById("fav-btn");
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        
+        if (favorites.some(fav => fav.title === movie.title)) {
+            favBtn.innerText = "Already Added";
+            favBtn.disabled = true;
+        } else {
+            favBtn.addEventListener("click", () => {
+                favorites.push(movie);
+                localStorage.setItem("favorites", JSON.stringify(favorites));
+                favBtn.innerText = "Already Added";
+                favBtn.disabled = true;
+            });
+        }
+    </script>
 </body>
 </html>
