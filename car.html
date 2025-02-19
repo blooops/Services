@@ -15,16 +15,22 @@
         }
         .carousel-container {
             display: flex;
-            overflow: hidden;
-            width: 300px;
-            height: 200px;
+            overflow-x: auto;
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            background: white;
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
+            gap: 10px;
+            scrollbar-width: none;
         }
         .carousel-container img {
-            width: 100%;
-            transition: transform 0.5s ease-in-out;
+            width: 150px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -36,24 +42,28 @@
     function getURLParams() {
         const params = new URLSearchParams(window.location.search);
         return {
-            image: params.get('image'),
-            redirect: params.get('redirect')
+            images: params.get("image") ? params.get("image").split(",") : [],
+            redirects: params.get("redirect") ? params.get("redirect").split(",") : []
         };
     }
 
     function createCarousel() {
         const params = getURLParams();
-        if (params.image && params.redirect) {
-            const img = document.createElement('img');
-            img.src = decodeURIComponent(params.image);
-            img.alt = "Movie Image";
-            img.onclick = () => {
-                window.location.href = params.redirect;
-                saveToCW(params.image);
-            };
-            document.getElementById("carousel").appendChild(img);
+        const carousel = document.getElementById("carousel");
+
+        if (params.images.length > 0 && params.redirects.length > 0) {
+            params.images.forEach((image, index) => {
+                const img = document.createElement("img");
+                img.src = decodeURIComponent(image);
+                img.alt = "Movie Image";
+                img.onclick = () => {
+                    window.location.href = params.redirects[index];
+                    saveToCW(image);
+                };
+                carousel.appendChild(img);
+            });
         } else {
-            document.getElementById("carousel").innerHTML = "<p>No image found</p>";
+            carousel.innerHTML = "<p>No images found</p>";
         }
     }
 
@@ -70,4 +80,3 @@
 
 </body>
 </html>
-
