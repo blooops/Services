@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embed ColdHotstar</title>
+    <title>Embed2</title>
     <style>
         body {
             margin: 0;
@@ -49,7 +49,7 @@
         }
 
         document.addEventListener("keydown", function(event) {
-            if ((event.key === "PrintScreen") || (event.metaKey && event.key === "s")) {
+            if (event.key === "PrintScreen" || (event.ctrlKey && event.key === "s")) {
                 event.preventDefault();
                 showToast();
                 blackoutScreen();
@@ -75,13 +75,21 @@
             }
         });
 
-        window.addEventListener("keydown", function(event) {
-            if (event.key === "VolumeUp" || event.key === "VolumeDown" || event.key === "Power") {
-                event.preventDefault();
-                showToast();
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
                 blackoutScreen();
             }
         });
+
+        function detectScreenCapture() {
+            let video = document.createElement('video');
+            navigator.mediaDevices.getDisplayMedia({ video: true }).then(() => {
+                showToast();
+                blackoutScreen();
+            }).catch(() => {});
+        }
+
+        setInterval(detectScreenCapture, 1000);
     </script>
 </body>
 </html>
