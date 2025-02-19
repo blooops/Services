@@ -3,23 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Draggable Carousel & Grid View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            flex-direction: column;
+        }
+        
+        /* Carousel Container */
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            gap: 10px;
+            scrollbar-width: none;
+            cursor: grab;
+            user-select: none;
+            scroll-behavior: smooth;
+        }
+        
+        .carousel-container img {
+            width: 150px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* Button */
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Login</h2>
-        <div class="dp-container">
-            <img id="userDP" src="" alt="Profile DP">
-            <h3 id="userName"></h3>
-            <p id="maskedInfo"></p>
-        </div>
-        <input type="text" id="userInput" placeholder="Enter Email or Phone">
-        <button id="nextBtn" onclick="checkUser()">Next</button>
-        <input type="password" id="password" placeholder="Enter Password">
-        <button id="loginBtn" onclick="login()">Login</button>
-        <p>New User? <a href="signup.html">Signup</a></p>
-    </div>
-    <script src="script.js"></script>
+
+<div class="carousel-container" id="carousel"></div>
+<div class="grid-container" id="gridView"></div>
+
+<button onclick="toggleView()">Toggle Full View</button>
+
+<script>
+    let isDragging = false;
+    let startX, scrollLeft;
+
+    function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            images: params.get("image") ? params.get("image").split(",") : [],
+            redirects: params.get("redirect") ? params.get("redirect").split(",") : []
+        };
+    }
+
+    function createCarousel() {
+        const params = getURLParams();
+        const carousel = document.getElementById("carousel");
+        const gridView = document.getElementById("gridView");
+
+        if (params.images.length > 0 && params.redirects.length > 0) {
+            params.images.forEach((image, index) => {
+                const img = document.createElement("img");
+                img.src = decodeURIComponent(image);
+                img.alt = "Movie Image";
+                img.onclick = () => {
+                    window.location.href = params.redirects[index];
+                    saveToCW(image);
+                };
+                carousel.appendChild(img);
+
+                // Add to grid view
+                const gridImg = img.cloneNode(true);
+                gridView.appendChild(gridImg);
+            });
+        } else {
+            carousel.innerHTML = "<p>No images found</p>";
+        }
+    }
+
+    function saveToCW(imageUrl) {
+        let clickedMovies = JSON.parse(localStorage.getItem("clickedMovies")) || [];
+        if (!clickedMovies.includes(imageUrl)) {
+            clickedMovies.push(imageUrl);
+            localStorage.setItem("clickedMovies", JSON.stringify(clickedMovies));
+        }
+    }
+
+    function toggleView() {
+        const carousel = document.getElementById("carousel");
+        const gridView = document.getElementById("gridView");
+
+        if (carousel.style.display !== "none") {
+            carousel.style.display = "none";
+            gridView.style.display = "grid";
+        } else {
+            carousel.style.display = "flex";
+            gridView.style.display = "none";
+        }
+    }
+
+    // Draggable Carousel
+    const carousel = document.getElementById("carousel");
+
+    carousel.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+        carousel.style.cursor = "grabbing";
+    });
+
+    carousel.addEventListener("mouseleave", () => {
+        isDragging = false;
+        carousel.style.cursor = "grab";
+    });
+
+    carousel.addEventListener("mouseup", () => {
+        isDragging = false;
+        carousel.style.cursor = "grab";
+    });
+
+    carousel.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 2;
+        carousel.scrollLeft = scrollLeft - walk;
+    });
+
+    createCarousel();
+</script>
+
 </body>
 </html>
