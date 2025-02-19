@@ -7,18 +7,12 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Edit Profile</h2>
-        <img id="currentDP" src="">
-        <div class="dp-carousel">
-            <img class="dp-option" src="dp1.png" onclick="selectDP(this)">
-            <img class="dp-option" src="dp2.png" onclick="selectDP(this)">
-            <img class="dp-option" src="dp3.png" onclick="selectDP(this)">
-        </div>
-        <input type="text" id="editName">
-        <input type="password" id="editPassword" placeholder="New Password">
-        <button onclick="saveProfile()">Save Changes</button>
-        <a href="logout.html">Logout</a>
+    <div class="profile-container">
+        <img id="profilePic" src="" alt="Profile Picture">
+        <h2 id="profileName"></h2>
+        <p id="profileMobile"></p>
+        <a href="edit-profile.html">Edit Profile</a>
+        <button onclick="logout()">Logout</button>
     </div>
     <script src="script.js"></script>
 </body>
