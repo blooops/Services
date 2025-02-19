@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Sign Up</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Signup</h2>
-        <div class="dp-carousel">
-            <img class="dp-option" src="dp1.png" onclick="selectDP(this)">
-            <img class="dp-option" src="dp2.png" onclick="selectDP(this)">
-            <img class="dp-option" src="dp3.png" onclick="selectDP(this)">
+    <div class="overlay">
+        <div class="signup-container">
+            <h2>Sign Up</h2>
+            <div class="carousel">
+                <img src="dp1.jpg" onclick="selectDP('dp1.jpg')">
+                <img src="dp2.jpg" onclick="selectDP('dp2.jpg')">
+                <img src="dp3.jpg" onclick="selectDP('dp3.jpg')">
+            </div>
+            <input type="text" id="fullName" placeholder="Enter Full Name">
+            <input type="text" id="signupMobile" readonly>
+            <input type="password" id="signupPassword" placeholder="Create Password">
+            <button onclick="signupUser()">Sign Up</button>
         </div>
-        <input type="text" id="fullName" placeholder="Full Name">
-        <input type="text" id="emailOrPhone" placeholder="Email or Phone">
-        <input type="password" id="password" placeholder="Password">
-        <button onclick="signup()">Sign Up</button>
-        <p>Already have an account? <a href="index.html">Login</a></p>
     </div>
     <script src="script.js"></script>
 </body>
