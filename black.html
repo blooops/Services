@@ -8,6 +8,8 @@
         body {
             margin: 0;
             overflow: hidden;
+            background-color: white;
+            transition: background-color 0.5s;
         }
         iframe {
             width: 100vw;
@@ -30,7 +32,7 @@
     </style>
 </head>
 <body>
-    <iframe src="coldhotstar.framer.ai"></iframe>
+    <iframe id="contentFrame" src="coldhotstar.framer.ai"></iframe>
     <div id="toast" class="android-toast">Screenshots are disabled!</div>
     <script>
         function showToast() {
@@ -41,10 +43,16 @@
             }, 2000);
         }
 
+        function blackoutScreen() {
+            document.body.style.backgroundColor = "black";
+            document.getElementById("contentFrame").style.display = "none";
+        }
+
         document.addEventListener("keydown", function(event) {
             if ((event.key === "PrintScreen") || (event.metaKey && event.key === "s")) {
                 event.preventDefault();
                 showToast();
+                blackoutScreen();
             }
         });
 
@@ -62,6 +70,7 @@
                 swipeCount++;
                 if (swipeCount >= 2) {
                     showToast();
+                    blackoutScreen();
                 }
             }
         });
@@ -70,6 +79,7 @@
             if (event.key === "VolumeUp" || event.key === "VolumeDown" || event.key === "Power") {
                 event.preventDefault();
                 showToast();
+                blackoutScreen();
             }
         });
     </script>
