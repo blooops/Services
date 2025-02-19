@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicked Movies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding-top: 20px;
+        }
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            gap: 10px;
+            scrollbar-width: none;
+        }
+        .carousel-container img {
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Clicked Movies</h2>
+<div class="carousel-container" id="movieCarousel"></div>
+
+<script>
+    function loadClickedMovies() {
+        let clickedMovies = JSON.parse(localStorage.getItem("clickedMovies")) || [];
+        const carousel = document.getElementById("movieCarousel");
+        carousel.innerHTML = "";  
+
+        if (clickedMovies.length === 0) {
+            carousel.innerHTML = "<p>No movies clicked yet.</p>";
+        } else {
+            clickedMovies.forEach(imageUrl => {
+                const img = document.createElement("img");
+                img.src = imageUrl;
+                img.alt = "Movie";
+                carousel.appendChild(img);
+            });
+        }
+    }
+
+    loadClickedMovies();
+</script>
+
+</body>
+</html>
