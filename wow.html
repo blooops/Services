@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed ColdHotstar</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+        .android-toast {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="coldhotstar.framer.ai"></iframe>
+    <div id="toast" class="android-toast">Screenshots are disabled!</div>
+    <script>
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.style.display = "block";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 2000);
+        }
+
+        document.addEventListener("keydown", function(event) {
+            if ((event.key === "PrintScreen") || (event.metaKey && event.key === "s")) {
+                event.preventDefault();
+                showToast();
+            }
+        });
+
+        let swipeCount = 0;
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener("touchstart", function(event) {
+            touchStartY = event.touches[0].clientY;
+        });
+
+        document.addEventListener("touchend", function(event) {
+            touchEndY = event.changedTouches[0].clientY;
+            if (Math.abs(touchStartY - touchEndY) > 50) {
+                swipeCount++;
+                if (swipeCount >= 2) {
+                    showToast();
+                }
+            }
+        });
+
+        window.addEventListener("keydown", function(event) {
+            if (event.key === "VolumeUp" || event.key === "VolumeDown" || event.key === "Power") {
+                event.preventDefault();
+                showToast();
+            }
+        });
+    </script>
+</body>
+</html>
