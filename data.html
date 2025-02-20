@@ -1,61 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Embed Any Link</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background-color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-        iframe {
-            position: absolute;
-            top: -20px;
-            left: -20px;
-            right: -20px;
-            bottom: -20px;
-            width: calc(100vw - 40px);
-            height: calc(100vh - 40px);
-            border: none;
-        }
-    </style>
-</head>
-<body>
-    <iframe id="embeddedPage"></iframe>
+const movies = [
+  {
+    id: 1,
+    title: "Inception",
+    genre: ["Sci-Fi", "Action", "Thriller"],
+    releaseYear: 2010,
+    director: "Christopher Nolan",
+    rating: 8.8,
+    duration: "2h 28m",
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg",
+  },
+  {
+    id: 2,
+    title: "The Dark Knight",
+    genre: ["Action", "Crime", "Drama"],
+    releaseYear: 2008,
+    director: "Christopher Nolan",
+    rating: 9.0,
+    duration: "2h 32m",
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+  },
+  {
+    id: 3,
+    title: "Interstellar",
+    genre: ["Sci-Fi", "Drama", "Adventure"],
+    releaseYear: 2014,
+    director: "Christopher Nolan",
+    rating: 8.6,
+    duration: "2h 49m",
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+  },
+  {
+    id: 4,
+    title: "The Matrix",
+    genre: ["Sci-Fi", "Action"],
+    releaseYear: 1999,
+    director: "Lana Wachowski, Lilly Wachowski",
+    rating: 8.7,
+    duration: "2h 16m",
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+  },
+  {
+    id: 5,
+    title: "Avatar",
+    genre: ["Sci-Fi", "Adventure", "Fantasy"],
+    releaseYear: 2009,
+    director: "James Cameron",
+    rating: 7.9,
+    duration: "2h 42m",
+    language: "English",
+    poster: "https://image.tmdb.org/t/p/w500/kyeqWdyUXW608qlYkRqosgbbJyK.jpg",
+  }
+];
 
-    <script>
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        function loadEmbeddedPage() {
-            let url = getQueryParam("p");
-
-            if (!url) {
-                document.body.innerHTML = "<h2 style='color: white;'>No URL provided in the 'p' parameter!</h2>";
-                return;
-            }
-
-            // Ensure the URL starts with http:// or https://
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://" + url;
-            }
-
-            document.getElementById("embeddedPage").src = url;
-        }
-
-        loadEmbeddedPage();
-    </script>
-</body>
-</html>
+export default movies;
