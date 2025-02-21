@@ -5,7 +5,7 @@ const movies = [
         logo: "chernobyl-logo.png", // Replace with actual logo URL
         genre: "Drama",
         description: "A nuclear disaster changes history forever.",
-        specialCode: "chernobyl",
+        specialCode: "1240",
         redirectUrl: "https://www.hbo.com/chernobyl"
     },
     {
