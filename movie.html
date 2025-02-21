@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Details</title>
     <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
 </head>
 <body>
     <div class="movie-container">
@@ -17,5 +16,8 @@
         <button onclick="addToFavorites()">Add to Favorites</button>
         <a id="watch-link" class="watch-button" target="_blank">Watch Now</a>
     </div>
+
+    <script src="data.js"></script> <!-- Load movies before script.js -->
+    <script src="script.js"></script>
 </body>
 </html>
