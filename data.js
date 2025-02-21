@@ -1,59 +1,16 @@
 const movies = [
-  {
-    id: 1,
-    title: "top",
-    genre: ["Sci-Fi", "Action", "Thriller"],
-    releaseYear: 2010,
-    director: "Christopher Nolan",
-    rating: 8.8,
-    duration: "2h 28m",
-    language: "English",
-    poster: "https://img10.hotstar.com/image/upload/f_auto,q_90,w_1920/sources/r1/cms/prod/4954/1424954-a-cb8121dadec4",
-  },
-  {
-    id: 2,
-    title: "The Dark Knight",
-    genre: ["Action", "Crime", "Drama"],
-    releaseYear: 2008,
-    director: "Christopher Nolan",
-    rating: 9.0,
-    duration: "2h 32m",
-    language: "English",
-    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-  },
-  {
-    id: 3,
-    title: "Interstellar",
-    genre: ["Sci-Fi", "Drama", "Adventure"],
-    releaseYear: 2014,
-    director: "Christopher Nolan",
-    rating: 8.6,
-    duration: "2h 49m",
-    language: "English",
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-  },
-  {
-    id: 4,
-    title: "The Matrix",
-    genre: ["Sci-Fi", "Action"],
-    releaseYear: 1999,
-    director: "Lana Wachowski, Lilly Wachowski",
-    rating: 8.7,
-    duration: "2h 16m",
-    language: "English",
-    poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-  },
-  {
-    id: 5,
-    title: "Avatar",
-    genre: ["Sci-Fi", "Adventure", "Fantasy"],
-    releaseYear: 2009,
-    director: "James Cameron",
-    rating: 7.9,
-    duration: "2h 42m",
-    language: "English",
-    poster: "https://image.tmdb.org/t/p/w500/kyeqWdyUXW608qlYkRqosgbbJyK.jpg",
-  }
+    {
+        title: "Chernobyl",
+        image: "chernobyl.jpg", // Replace with actual movie poster URL
+        logo: "chernobyl-logo.png", // Replace with actual logo URL
+        genre: "Drama",
+        description: "April 1986: A nuclear power plant explodes at Chernobyl, USSR, resulting in one of history's worst man-made catastrophes.",
+        specialCode: "chernobyl",
+        redirectUrl: "https://www.hbo.com/chernobyl"
+    }
 ];
 
-export default movies;
+// Save to local storage if not already set
+if (!localStorage.getItem("movies")) {
+    localStorage.setItem("movies", JSON.stringify(movies));
+}
