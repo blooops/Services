@@ -44,6 +44,7 @@
     </div>
 
     <script>
+        // Retrieve Latest Message
         function getLatestMessage() {
             return JSON.parse(localStorage.getItem("latestMessage")) || {
                 title: "Watch Gaslighting Full Movie",
@@ -52,28 +53,38 @@
             };
         }
 
+        // Update UI with Latest Message
         function updateUI(messageData) {
             document.getElementById("messageTitle").innerText = messageData.title;
             document.getElementById("messageBody").innerText = messageData.body;
         }
 
+        // Redirect to Movie Link
         function redirectToMovie() {
             const messageData = getLatestMessage();
             window.location.href = messageData.url;
         }
 
+        // Send Mobile & Lock Screen Notification
         function sendNotification(title, body, url) {
             if (Notification.permission === "granted") {
                 navigator.serviceWorker.ready.then(reg => {
                     reg.showNotification(title, {
                         body: body,
-                        icon: "https://via.placeholder.com/100",
-                        data: { url: url }
+                        icon: "https://via.placeholder.com/100",  // App Icon
+                        badge: "https://via.placeholder.com/50", // Small icon for lock screen
+                        vibrate: [200, 100, 200],  // Vibration for Mobile Alert
+                        requireInteraction: true,  // Stays on Screen Until Dismissed
+                        data: { url: url },
+                        actions: [
+                            { action: "open", title: "🎬 Watch Now" }
+                        ]
                     });
                 });
             }
         }
 
+        // Publish New Message (Update & Notify)
         function publishNewMessage(title, body, url) {
             const newMessage = { title, body, url };
             localStorage.setItem("latestMessage", JSON.stringify(newMessage));
@@ -82,6 +93,7 @@
             updateUI(newMessage);
         }
 
+        // On Page Load, Show Latest Message
         window.onload = function() {
             const messageData = getLatestMessage();
             updateUI(messageData);
