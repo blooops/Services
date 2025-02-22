@@ -37,68 +37,28 @@
 </head>
 <body>
 
-    <div class="container" id="index">
+    <div class="container">
         <h1>Enable Notifications</h1>
         <button onclick="requestNotificationPermission()">Enable Notifications</button>
     </div>
 
-    <div class="container" id="msg" style="display: none;">
-        <h1 id="messageTitle">Watch Gaslighting Full Movie</h1>
-        <p id="messageBody">Click below to watch the full movie.</p>
-        <button onclick="redirectToMovie()">Watch Now</button>
-    </div>
-
     <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log("Service Worker Registered", reg))
+                .catch(err => console.log("Service Worker Error", err));
+        }
+
+        // Ask Notification Permission (Only Once)
         function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        localStorage.setItem("notificationsAllowed", "true");
-                        alert("Notifications enabled!");
-                        sendNotification("New Message", "Watch Gaslighting Full Movie - Click to open", "msg.html");
-                    } else {
-                        alert("Please allow notifications!");
-                    }
-                });
-            } else {
-                alert("Your browser does not support notifications.");
-            }
-        }
-
-        function sendNotification(title, body, url) {
-            if (Notification.permission === "granted") {
-                new Notification(title, {
-                    body: body,
-                    icon: "https://via.placeholder.com/100",
-                }).onclick = function() {
-                    window.location.href = url;
-                };
-            }
-        }
-
-        function redirectToMovie() {
-            window.location.href = "https://abc.xyz";
-        }
-
-        function detectPage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("page") === "msg") {
-                document.getElementById("index").style.display = "none";
-                document.getElementById("msg").style.display = "block";
-                
-                // Fetch dynamic message content from a server or local storage (if needed)
-                const msgTitle = "Watch Gaslighting Full Movie"; 
-                const msgBody = "Click below to watch the full movie.";
-                document.getElementById("messageTitle").innerText = msgTitle;
-                document.getElementById("messageBody").innerText = msgBody;
-
-                if (Notification.permission === "granted") {
-                    sendNotification(msgTitle, msgBody, "https://abc.xyz");
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    localStorage.setItem("notificationsAllowed", "true");
+                    alert("Notifications enabled!");
                 }
-            }
+            });
         }
-
-        detectPage();
     </script>
 
 </body>
