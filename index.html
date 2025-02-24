@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Authentication</title>
+    <title>Firebase Auth System</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,8 +47,8 @@
 <body>
 
     <div class="container">
-        <h2>Enter Mobile Number</h2>
-        <input type="tel" id="mobile" placeholder="Enter Mobile Number">
+        <h2>Enter Email</h2>
+        <input type="email" id="email" placeholder="Enter Email">
         <button onclick="checkUser()">Next</button>
 
         <div id="passwordSection" style="display: none;">
@@ -88,18 +88,18 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        let currentMobile = "";
+        let currentEmail = "";
 
         // Check if user exists
         window.checkUser = async function () {
-            const mobile = document.getElementById("mobile").value;
-            if (!mobile) {
-                alert("Please enter a mobile number.");
+            const email = document.getElementById("email").value;
+            if (!email) {
+                alert("Please enter an email.");
                 return;
             }
-            currentMobile = mobile;
+            currentEmail = email;
 
-            const userRef = doc(db, "users", mobile);
+            const userRef = doc(db, "users", email);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
@@ -121,19 +121,12 @@
                 return;
             }
 
-            const userRef = doc(db, "users", currentMobile);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                if (userData.password === password) {
-                    alert("Login Successful!");
-                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
-                } else {
-                    alert("Incorrect password!");
-                }
-            } else {
-                alert("User not found!");
+            try {
+                await signInWithEmailAndPassword(auth, currentEmail, password);
+                alert("Login Successful!");
+                window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+            } catch (error) {
+                alert("Error: " + error.message);
             }
         };
 
@@ -149,18 +142,20 @@
             }
 
             try {
+                // Create user in Firebase Auth
+                await createUserWithEmailAndPassword(auth, currentEmail, password);
+
                 // Upload image to Firebase Storage
-                const storageRef = ref(storage, `users/${currentMobile}`);
+                const storageRef = ref(storage, `users/${currentEmail}`);
                 await uploadBytes(storageRef, image);
 
                 // Get image URL
                 const imageUrl = await getDownloadURL(storageRef);
 
                 // Store user details in Firestore
-                await setDoc(doc(db, "users", currentMobile), {
-                    mobile: currentMobile,
+                await setDoc(doc(db, "users", currentEmail), {
+                    email: currentEmail,
                     name,
-                    password,
                     imageUrl
                 });
 
@@ -168,8 +163,7 @@
                 document.getElementById("signupSection").style.display = "none";
                 document.getElementById("passwordSection").style.display = "block";
             } catch (error) {
-                console.error("Error:", error);
-                alert(error.message);
+                alert("Error: " + error.message);
             }
         };
     </script>
