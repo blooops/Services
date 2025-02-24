@@ -3,62 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notification System</title>
+    <title>Firebase Authentication</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f4f4f4;
+            flex-direction: column;
         }
         .container {
-            margin-top: 50px;
             background: white;
             padding: 20px;
-            display: inline-block;
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        input, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            background: #007bff;
             color: white;
-            background-color: #007bff;
             border: none;
             cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
         }
         button:hover {
-            background-color: #0056b3;
+            background: #0056b3;
+        }
+        img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Enable Notifications</h1>
-        <button onclick="requestNotificationPermission()">Enable Notifications</button>
+        <h2>Enter Mobile Number</h2>
+        <input type="tel" id="mobile" placeholder="Enter Mobile Number">
+        <button onclick="checkUser()">Next</button>
+
+        <div id="passwordSection" style="display: none;">
+            <h2>Enter Password</h2>
+            <input type="password" id="password" placeholder="Enter Password">
+            <button onclick="loginUser()">Login</button>
+        </div>
+
+        <div id="signupSection" style="display: none;">
+            <h2>Sign Up</h2>
+            <input type="text" id="name" placeholder="Enter Name">
+            <input type="password" id="signupPassword" placeholder="Create Password">
+            <input type="file" id="image" accept="image/*">
+            <button onclick="registerUser()">Sign Up</button>
+        </div>
     </div>
 
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log("Service Worker Registered", reg))
-                .catch(err => console.log("Service Worker Error", err));
-        }
+    <script type="module">
+        // Firebase Configuration (Replace with your Firebase config)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-        // Ask Notification Permission (Only Once)
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    localStorage.setItem("notificationsAllowed", "true");
-                    alert("Notifications enabled!");
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjjBG-Jm2JsyIBn5DfgbvPw7Ua0p_3N0c",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let currentMobile = "";
+
+        // Check if user exists
+        window.checkUser = async function () {
+            const mobile = document.getElementById("mobile").value;
+            if (!mobile) {
+                alert("Please enter a mobile number.");
+                return;
+            }
+            currentMobile = mobile;
+
+            const userRef = doc(db, "users", mobile);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                // User exists, ask for password
+                document.getElementById("passwordSection").style.display = "block";
+                document.getElementById("signupSection").style.display = "none";
+            } else {
+                // New user, show sign-up form
+                document.getElementById("signupSection").style.display = "block";
+                document.getElementById("passwordSection").style.display = "none";
+            }
+        };
+
+        // User Login
+        window.loginUser = async function () {
+            const password = document.getElementById("password").value;
+            if (!password) {
+                alert("Please enter a password.");
+                return;
+            }
+
+            const userRef = doc(db, "users", currentMobile);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.password === password) {
+                    alert("Login Successful!");
+                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+                } else {
+                    alert("Incorrect password!");
                 }
-            });
-        }
+            } else {
+                alert("User not found!");
+            }
+        };
+
+        // Register User
+        window.registerUser = async function () {
+            const name = document.getElementById("name").value;
+            const password = document.getElementById("signupPassword").value;
+            const image = document.getElementById("image").files[0];
+
+            if (!name || !password || !image) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            try {
+                // Upload image to Firebase Storage
+                const storageRef = ref(storage, `users/${currentMobile}`);
+                await uploadBytes(storageRef, image);
+
+                // Get image URL
+                const imageUrl = await getDownloadURL(storageRef);
+
+                // Store user details in Firestore
+                await setDoc(doc(db, "users", currentMobile), {
+                    mobile: currentMobile,
+                    name,
+                    password,
+                    imageUrl
+                });
+
+                alert("User Registered Successfully! Please login.");
+                document.getElementById("signupSection").style.display = "none";
+                document.getElementById("passwordSection").style.display = "block";
+            } catch (error) {
+                console.error("Error:", error);
+                alert(error.message);
+            }
+        };
     </script>
 
 </body>
