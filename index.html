@@ -3,45 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Auth System</title>
+    <title>Firebase Email Authentication</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f4f4f4;
-            flex-direction: column;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        input, button {
-            width: 100%;
-            margin: 10px 0;
-            padding: 10px;
-        }
-        button {
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-        img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-top: 10px;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { width: 300px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -49,30 +16,29 @@
     <div class="container">
         <h2>Enter Email</h2>
         <input type="email" id="email" placeholder="Enter Email">
-        <button onclick="checkUser()">Next</button>
+        <button id="checkUserBtn">Next</button>
 
         <div id="passwordSection" style="display: none;">
             <h2>Enter Password</h2>
             <input type="password" id="password" placeholder="Enter Password">
-            <button onclick="loginUser()">Login</button>
+            <button id="loginBtn">Login</button>
         </div>
 
         <div id="signupSection" style="display: none;">
             <h2>Sign Up</h2>
             <input type="text" id="name" placeholder="Enter Name">
             <input type="password" id="signupPassword" placeholder="Create Password">
-            <input type="file" id="image" accept="image/*">
-            <button onclick="registerUser()">Sign Up</button>
+            <button id="signupBtn">Sign Up</button>
         </div>
     </div>
 
     <script type="module">
-        // Firebase Configuration (Replace with your Firebase config)
+        // 🔥 Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+        // 🔹 Replace with Your Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBjjBG-Jm2JsyIBn5DfgbvPw7Ua0p_3N0c",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -82,16 +48,15 @@
             appId: "YOUR_APP_ID"
         };
 
-        // Initialize Firebase
+        // 🔥 Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         let currentEmail = "";
 
-        // Check if user exists
-        window.checkUser = async function () {
+        // 🟢 Check if user exists
+        async function checkUser() {
             const email = document.getElementById("email").value;
             if (!email) {
                 alert("Please enter an email.");
@@ -103,69 +68,54 @@
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                // User exists, ask for password
+                // If user exists, show password input
                 document.getElementById("passwordSection").style.display = "block";
                 document.getElementById("signupSection").style.display = "none";
             } else {
-                // New user, show sign-up form
+                // If user does not exist, show sign-up form
                 document.getElementById("signupSection").style.display = "block";
                 document.getElementById("passwordSection").style.display = "none";
             }
-        };
+        }
 
-        // User Login
-        window.loginUser = async function () {
+        // 🟢 Login User
+        async function loginUser() {
             const password = document.getElementById("password").value;
             if (!password) {
-                alert("Please enter a password.");
+                alert("Please enter your password.");
                 return;
             }
 
-            try {
-                await signInWithEmailAndPassword(auth, currentEmail, password);
-                alert("Login Successful!");
-                window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        };
+            signInWithEmailAndPassword(auth, currentEmail, password)
+                .then(() => {
+                    alert("Login successful!");
+                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+                })
+                .catch(error => alert(error.message));
+        }
 
-        // Register User
-        window.registerUser = async function () {
+        // 🟢 Register User
+        async function registerUser() {
             const name = document.getElementById("name").value;
             const password = document.getElementById("signupPassword").value;
-            const image = document.getElementById("image").files[0];
-
-            if (!name || !password || !image) {
+            if (!name || !password) {
                 alert("Please fill all fields.");
                 return;
             }
 
-            try {
-                // Create user in Firebase Auth
-                await createUserWithEmailAndPassword(auth, currentEmail, password);
+            createUserWithEmailAndPassword(auth, currentEmail, password)
+                .then(async userCredential => {
+                    await setDoc(doc(db, "users", currentEmail), { name, email: currentEmail });
+                    alert("Account created successfully!");
+                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+                })
+                .catch(error => alert(error.message));
+        }
 
-                // Upload image to Firebase Storage
-                const storageRef = ref(storage, `users/${currentEmail}`);
-                await uploadBytes(storageRef, image);
-
-                // Get image URL
-                const imageUrl = await getDownloadURL(storageRef);
-
-                // Store user details in Firestore
-                await setDoc(doc(db, "users", currentEmail), {
-                    email: currentEmail,
-                    name,
-                    imageUrl
-                });
-
-                alert("User Registered Successfully! Please login.");
-                document.getElementById("signupSection").style.display = "none";
-                document.getElementById("passwordSection").style.display = "block";
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        };
+        // 🟢 Button Event Listeners
+        document.getElementById("checkUserBtn").addEventListener("click", checkUser);
+        document.getElementById("loginBtn").addEventListener("click", loginUser);
+        document.getElementById("signupBtn").addEventListener("click", registerUser);
     </script>
 
 </body>
