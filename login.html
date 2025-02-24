@@ -3,23 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Firebase Authentication</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { width: 300px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div class="full-screen-container">
-        <h2>Login or Sign Up</h2>
-        <div class="input-group">
-            <span>+91</span>
-            <input type="text" id="mobileNumber" placeholder="Enter mobile number">
+
+    <div class="container">
+        <h2>Enter Email</h2>
+        <input type="email" id="email" placeholder="Enter Email">
+        <button id="checkUserBtn">Next</button>
+
+        <div id="passwordSection" style="display: none;">
+            <h2>Enter Password</h2>
+            <input type="password" id="password" placeholder="Enter Password">
+            <button id="loginBtn">Login</button>
         </div>
-        <p class="terms">
-            By proceeding, you confirm that you are above 18 years of age and agree to the 
-            <a href="#">Privacy Policy</a> & <a href="#">Terms of Use</a>.
-        </p>
-        <button onclick="checkUser()">Continue</button>
-        <p class="help"><a href="#">Having trouble logging in? Get Help</a></p>
+
+        <div id="signupSection" style="display: none;">
+            <h2>Sign Up</h2>
+            <input type="text" id="name" placeholder="Enter Name">
+            <input type="password" id="signupPassword" placeholder="Create Password">
+            <button id="signupBtn">Sign Up</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <script type="module">
+        // 🔥 Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // 🔹 Firebase Config (Your API Key)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjjBGJm2JsyIBn5DfgbvPw7Ua0p_3N0c",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // 🔥 Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentEmail = "";
+
+        // 🟢 Check if user exists
+        async function checkUser() {
+            const email = document.getElementById("email").value.trim();
+            if (!email) {
+                alert("Please enter an email.");
+                return;
+            }
+            currentEmail = email;
+
+            const userRef = doc(db, "users", email);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                document.getElementById("passwordSection").style.display = "block";
+                document.getElementById("signupSection").style.display = "none";
+            } else {
+                document.getElementById("signupSection").style.display = "block";
+                document.getElementById("passwordSection").style.display = "none";
+            }
+        }
+
+        // 🟢 Login User
+        async function loginUser() {
+            const password = document.getElementById("password").value.trim();
+            if (!password) {
+                alert("Please enter your password.");
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, currentEmail, password)
+                .then(() => {
+                    alert("Login successful!");
+                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+                })
+                .catch(error => alert("Error: " + error.message));
+        }
+
+        // 🟢 Register User
+        async function registerUser() {
+            const name = document.getElementById("name").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+            if (!name || !password) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            createUserWithEmailAndPassword(auth, currentEmail, password)
+                .then(async () => {
+                    await setDoc(doc(db, "users", currentEmail), { name, email: currentEmail });
+                    alert("Account created successfully!");
+                    window.location.href = "https://abc.xyz"; // Redirect to abc.xyz
+                })
+                .catch(error => alert("Error: " + error.message));
+        }
+
+        // 🟢 Event Listeners
+        document.getElementById("checkUserBtn").addEventListener("click", checkUser);
+        document.getElementById("loginBtn").addEventListener("click", loginUser);
+        document.getElementById("signupBtn").addEventListener("click", registerUser);
+    </script>
+
 </body>
 </html>
